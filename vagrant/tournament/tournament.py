@@ -45,7 +45,6 @@ def registerPlayer(name, tourney_id=None):
         (use None to auto-detect the most recent tournament)
     """
     name = bleach.clean(name)
-
     tourney_id = getOrCreateTournament()
 
     conn=connect()
@@ -80,6 +79,8 @@ def reportMatch(winner, loser, draw=False):
       draw: if true, both players should receive a draw result
             instead of a win and loss, respectively
     """
+
+
 
 
 def swissPairings():

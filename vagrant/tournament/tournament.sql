@@ -19,7 +19,6 @@ CREATE TABLE tournaments (
 CREATE TABLE matches (
     match_id SERIAL PRIMARY KEY,
     tourney_id integer NOT NULL REFERENCES tournaments,
-    round_played integer NOT NULL
 );
 
 CREATE TABLE match_results (
