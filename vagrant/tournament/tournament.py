@@ -31,11 +31,29 @@ def deleteMatches(tourney_id=None):
         tourney_id = getOrCreateTournament()
 
 
-
-
 def deletePlayers(tourney_id=None):
     """
-    Remove all the player records from the given tournament.
+    Remove all the player records from the given tournament
+    (but not from the players table).
+
+    Args:
+        tourney_id: the id of the currently running tournament
+          (use None to auto-detect the most recent one)
+    """
+    if not tourney_id:
+        tourney_id = getOrCreateTournament()
+
+    conn = connect()
+    c = conn.cursor()
+    c.execute("DELETE FROM tournament_player_maps WHERE tourney_id = %s", (tourney_id,))
+    conn.commit()
+    conn.close()
+
+
+def deactivatePlayers(tourney_id=None):
+    """
+    Marks all players in the given tournament as inactive
+    (their records will still exist in tournament_player_maps).
 
     Args:
         tourney_id: the id of the currently running tournament
