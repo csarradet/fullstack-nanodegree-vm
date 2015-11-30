@@ -33,6 +33,8 @@ to tournament_test.py to demonstrate functionality:
  - Support tiebreaks via Opponent Match Win (OMW) percentage
  - Support multiple tournaments
 
-
-
-
+ I changed how the deletePlayers() function works slightly.
+ Multiple tourney support means that the player might still be
+ enrolled somewhere else, so instead we just mark them as
+ inactive within the given tourney and leave their record
+ in the players table of the database.

@@ -18,9 +18,11 @@ CREATE TABLE tournaments (
 
 CREATE TABLE matches (
     match_id SERIAL PRIMARY KEY,
-    tourney_id integer NOT NULL REFERENCES tournaments,
+    tourney_id integer NOT NULL REFERENCES tournaments
 );
 
+-- A match may only have one player in the case of a bye, so
+-- we're splitting that off into a separate table.
 CREATE TABLE match_results (
     match_id integer NOT NULL REFERENCES matches,
     player_id integer NOT NULL REFERENCES players,
