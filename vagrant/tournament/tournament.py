@@ -27,6 +27,8 @@ def deleteMatches(tourney_id=None):
         tourney_id: the id of the currently running tournament
           (use None to auto-detect the most recent one)
     """
+    if not tourney_id:
+        tourney_id = getOrCreateTournament()
 
 
 def deletePlayers(tourney_id=None):
@@ -37,10 +39,13 @@ def deletePlayers(tourney_id=None):
         tourney_id: the id of the currently running tournament
           (use None to auto-detect the most recent one)
     """
-    conn=connect()
-    c=conn.cursor()
-    c.execute("INSERT INTO players(name) VALUES (%s) RETURNING player_id",(name,))
-    player_id = c.fetchone()[0]
+    if not tourney_id:
+        tourney_id = getOrCreateTournament()
+
+    conn = connect()
+    c = conn.cursor()
+    c.execute("UPDATE tournament_player_maps SET active = False " +
+            "WHERE tourney_id = %s", (tourney_id))
     conn.commit()
     conn.close()
 
@@ -52,6 +57,8 @@ def countPlayers(tourney_id=None):
         tourney_id: the id of the currently running tournament
           (use None to auto-detect the most recent one)
     """
+    if not tourney_id:
+        tourney_id = getOrCreateTournament()
 
 
 def registerPlayer(name, tourney_id=None):
@@ -68,7 +75,8 @@ def registerPlayer(name, tourney_id=None):
         (use None to auto-detect the most recent one)
     """
     name = bleach.clean(name)
-    tourney_id = getOrCreateTournament()
+    if not tourney_id:
+        tourney_id = getOrCreateTournament()
 
     conn = connect()
     c = conn.cursor()
@@ -96,6 +104,8 @@ def playerStandings(tourney_id=None):
         tourney_id: the id of the currently running tournament
           (use None to auto-detect the most recent one)
     """
+    if not tourney_id:
+        tourney_id = getOrCreateTournament()
 
 
 def reportMatch(winner, loser, tourney_id=None):
@@ -109,6 +119,8 @@ def reportMatch(winner, loser, tourney_id=None):
         tourney_id: the id of the currently running tournament
           (use None to auto-detect the most recent one)
     """
+    if not tourney_id:
+        tourney_id = getOrCreateTournament()
 
 def reportDraw(player1, player2, tourney_id=None):
     """
@@ -118,6 +130,8 @@ def reportDraw(player1, player2, tourney_id=None):
         tourney_id: the id of the currently running tournament
           (use None to auto-detect the most recent one)
     """
+    if not tourney_id:
+        tourney_id = getOrCreateTournament()
 
 def reportBye(player, tourney_id=None):
     """
@@ -125,6 +139,8 @@ def reportBye(player, tourney_id=None):
         tourney_id: the id of the currently running tournament
           (use None to auto-detect the most recent one)
     """
+    if not tourney_id:
+        tourney_id = getOrCreateTournament()
 
 def swissPairings(tourney_id=None):
     """Returns a list of pairs of players for the next round of a match.
@@ -145,6 +161,8 @@ def swissPairings(tourney_id=None):
         tourney_id: the id of the currently running tournament
           (use None to auto-detect the most recent one)
     """
+    if not tourney_id:
+        tourney_id = getOrCreateTournament()
 
 def createTournament():
     """
