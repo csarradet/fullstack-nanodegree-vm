@@ -191,7 +191,7 @@ def reportMatch(winner, loser, tourney_id=None):
 
 def reportDraw(player1, player2, tourney_id=None):
     """
-    Reports that the provided lay
+    Reports that the game played between these two players was a draw.
 
     Args:
         tourney_id: the id of the currently running tournament
@@ -214,12 +214,26 @@ def reportDraw(player1, player2, tourney_id=None):
 
 def reportBye(player, tourney_id=None):
     """
+    Reports that the player received a bye, and updates the database so
+    that they will be ineligible for further byes.
+
     Args:
         tourney_id: the id of the currently running tournament
           (use None to auto-detect the most recent one)
     """
     if not tourney_id:
         tourney_id = getOrCreateTournament()
+
+    conn = connect()
+    c = conn.cursor()
+    c.execute("INSERT INTO matches(tourney_id) VALUES(%s) RETURNING match_id", (tourney_id,))
+    match_id = c.fetchone()[0]
+    c.execute("INSERT INTO match_results(match_id, player_id, points_awarded) " +
+            "VALUES(%s, %s, %s)", (match_id, player, WIN_POINTS))
+    c.execute("UPDATE tournament_player_maps SET bye_awarded = true " +
+            "WHERE tourney_id = %s and player_id = %s", (tourney_id, player,))
+    conn.commit()
+    conn.close()
 
 
 def swissPairings(tourney_id=None):
