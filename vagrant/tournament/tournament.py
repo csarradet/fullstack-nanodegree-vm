@@ -14,6 +14,9 @@
 import psycopg2
 import bleach
 
+WIN_POINTS = 3
+DRAW_POINTS = 1
+LOSE_POINTS = 0
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
@@ -172,6 +175,17 @@ def reportMatch(winner, loser, tourney_id=None):
     """
     if not tourney_id:
         tourney_id = getOrCreateTournament()
+
+    conn = connect()
+    c = conn.cursor()
+    c.execute("INSERT INTO matches(tourney_id) VALUES(%s) RETURNING match_id", (tourney_id,))
+    match_id = c.fetchone()[0]
+    c.execute("INSERT INTO match_results(match_id, player_id, points_awarded) " +
+            "VALUES(%s, %s, %s)", (match_id, winner, WIN_POINTS))
+    c.execute("INSERT INTO match_results(match_id, player_id, points_awarded) " +
+            "VALUES(%s, %s, %s)", (match_id, loser, LOSE_POINTS))
+    conn.commit()
+    conn.close()
 
 def reportDraw(player1, player2, tourney_id=None):
     """
