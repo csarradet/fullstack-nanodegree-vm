@@ -15,6 +15,8 @@ from the client:
 
 The following assumptions are taken from the provided
 WotC document describing the DCI's Swiss pairing system
+and this doc on resolving tiebreakers:
+https://www.wizards.com/dci/downloads/tiebreakers.pdf
 (largely to save time--I actually play in M:TG tournaments
 already, so I'm familiar with the rules system and many of
 its quirks):
@@ -23,6 +25,10 @@ its quirks):
 - A loss counts as zero points
 - When appropriate, byes are awarded to the lowest-ranked
   player who has yet to receive a bye.
+- To account for draws, a player's match win percentage
+  is found by dividing their match points by three with a floor
+  of 0.33 (to mitigate the impact of playing against extremely
+  weak players).
 
 The following extra credit goals were attempted.  I left
 the original tests in place, but added additional test cases

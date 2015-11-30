@@ -22,6 +22,7 @@ def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
     return psycopg2.connect("dbname=tournament")
 
+
 def deleteMatches(tourney_id=None):
     """
     Remove all the match records from the database.
@@ -72,6 +73,7 @@ def deactivatePlayers(tourney_id=None):
     conn.commit()
     conn.close()
 
+
 def countPlayers(tourney_id=None):
     """
     Returns the number of players currently registered.
@@ -91,7 +93,6 @@ def countPlayers(tourney_id=None):
     conn.commit()
     conn.close()
     return row_count
-
 
 
 def registerPlayer(name, tourney_id=None):
@@ -120,6 +121,7 @@ def registerPlayer(name, tourney_id=None):
 
     attachPlayer(player_id, tourney_id)
 
+
 def attachPlayer(player_id, tourney_id=None):
     """
     Attaches an existing player to the given tournament (does not create
@@ -138,7 +140,6 @@ def attachPlayer(player_id, tourney_id=None):
         "VALUES (%s, %s)", (tourney_id, player_id,))
     conn.commit()
     conn.close()
-
 
 
 def playerStandings(tourney_id=None):
@@ -187,6 +188,7 @@ def reportMatch(winner, loser, tourney_id=None):
     conn.commit()
     conn.close()
 
+
 def reportDraw(player1, player2, tourney_id=None):
     """
     Reports that the provided lay
@@ -198,6 +200,18 @@ def reportDraw(player1, player2, tourney_id=None):
     if not tourney_id:
         tourney_id = getOrCreateTournament()
 
+    conn = connect()
+    c = conn.cursor()
+    c.execute("INSERT INTO matches(tourney_id) VALUES(%s) RETURNING match_id", (tourney_id,))
+    match_id = c.fetchone()[0]
+    c.execute("INSERT INTO match_results(match_id, player_id, points_awarded) " +
+            "VALUES(%s, %s, %s)", (match_id, player1, DRAW_POINTS))
+    c.execute("INSERT INTO match_results(match_id, player_id, points_awarded) " +
+            "VALUES(%s, %s, %s)", (match_id, loser, LOSE_POINTS))
+    conn.commit()
+    conn.close()
+
+
 def reportBye(player, tourney_id=None):
     """
     Args:
@@ -206,6 +220,7 @@ def reportBye(player, tourney_id=None):
     """
     if not tourney_id:
         tourney_id = getOrCreateTournament()
+
 
 def swissPairings(tourney_id=None):
     """Returns a list of pairs of players for the next round of a match.
@@ -229,17 +244,7 @@ def swissPairings(tourney_id=None):
     if not tourney_id:
         tourney_id = getOrCreateTournament()
 
-def createTournament():
-    """
-    Add a new tournament to the database and return its tourney_id.
-    """
-    conn = connect()
-    c = conn.cursor()
-    c.execute("INSERT INTO tournaments(tourney_id) VALUES(default) RETURNING tourney_id")
-    tourney_id = c.fetchone()[0]
-    conn.commit()
-    conn.close()
-    return tourney_id
+
 
 def getOrCreateTournament():
     """
@@ -257,4 +262,18 @@ def getOrCreateTournament():
         return found[0]
     else:
         return createTournament()
+
+
+def createTournament():
+    """
+    Add a new tournament to the database and return its tourney_id.
+    """
+    conn = connect()
+    c = conn.cursor()
+    c.execute("INSERT INTO tournaments(tourney_id) VALUES(default) RETURNING tourney_id")
+    tourney_id = c.fetchone()[0]
+    conn.commit()
+    conn.close()
+    return tourney_id
+
 
