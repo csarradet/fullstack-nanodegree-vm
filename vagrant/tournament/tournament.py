@@ -31,6 +31,8 @@ def deleteMatches(tourney_id=None):
         tourney_id = getOrCreateTournament()
 
 
+
+
 def deletePlayers(tourney_id=None):
     """
     Remove all the player records from the given tournament.
@@ -45,7 +47,7 @@ def deletePlayers(tourney_id=None):
     conn = connect()
     c = conn.cursor()
     c.execute("UPDATE tournament_player_maps SET active = False " +
-            "WHERE tourney_id = %s", (tourney_id))
+            "WHERE tourney_id = %s", (tourney_id,))
     conn.commit()
     conn.close()
 
@@ -59,6 +61,16 @@ def countPlayers(tourney_id=None):
     """
     if not tourney_id:
         tourney_id = getOrCreateTournament()
+
+    conn = connect()
+    c = conn.cursor()
+    c.execute("SELECT COUNT(*) FROM tournament_player_maps " +
+            "WHERE tourney_id = %s AND active = true", (tourney_id,))
+    row_count = c.fetchone()[0]
+    conn.commit()
+    conn.close()
+    return row_count
+
 
 
 def registerPlayer(name, tourney_id=None):
