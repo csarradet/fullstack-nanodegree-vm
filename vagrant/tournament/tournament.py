@@ -24,8 +24,15 @@ def deleteMatches():
 
 
 def deletePlayers():
-    """Remove all the player records from the database."""
-
+    """
+    Remove all the player records from the database.
+    """
+    conn=connect()
+    c=conn.cursor()
+    c.execute("INSERT INTO players(name) VALUES (%s) RETURNING player_id",(name,))
+    player_id = c.fetchone()[0]
+    conn.commit()
+    conn.close()
 
 def countPlayers():
     """Returns the number of players currently registered."""
@@ -47,13 +54,14 @@ def registerPlayer(name, tourney_id=None):
     name = bleach.clean(name)
     tourney_id = getOrCreateTournament()
 
-    conn=connect()
-    c=conn.cursor()
+    conn = connect()
+    c = conn.cursor()
     c.execute("INSERT INTO players(name) VALUES (%s) RETURNING player_id",(name,))
     player_id = c.fetchone()[0]
+    c.execute("INSERT INTO tournament_player_maps(tourney_id, player_id) " +
+        "VALUES (%s, %s)", (tourney_id, player_id,))
     conn.commit()
     conn.close()
-
 
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
@@ -70,7 +78,7 @@ def playerStandings():
     """
 
 
-def reportMatch(winner, loser, draw=False):
+def reportMatch(winner, loser):
     """Records the outcome of a single match between two players.
 
     Args:
@@ -80,8 +88,13 @@ def reportMatch(winner, loser, draw=False):
             instead of a win and loss, respectively
     """
 
+def reportDraw(player1, player2):
+    """
+    """
 
-
+def reportBye(player):
+    """
+    """
 
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
@@ -103,8 +116,8 @@ def createTournament():
     """
     Add a new tournament to the database and return its tourney_id.
     """
-    conn=connect()
-    c=conn.cursor()
+    conn =c onnect()
+    c = conn.cursor()
     c.execute("INSERT INTO tournaments(tourney_id) VALUES(default) RETURNING tourney_id")
     tourney_id = c.fetchone()[0]
     conn.commit()
@@ -119,8 +132,8 @@ def getOrCreateTournament():
     of the most recently created one.
     Otherwise, create a new tournament and return its tourney_id.
     """
-    conn=connect()
-    c=conn.cursor()
+    conn = connect()
+    c = conn.cursor()
     c.execute("SELECT tourney_id FROM tournaments ORDER BY tourney_id DESC LIMIT 1")
     found = c.fetchone()
     conn.commit()
