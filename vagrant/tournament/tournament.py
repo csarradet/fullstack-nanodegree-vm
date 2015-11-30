@@ -34,6 +34,12 @@ def deleteMatches(tourney_id=None):
     if not tourney_id:
         tourney_id = getOrCreateTournament()
 
+    conn = connect()
+    c = conn.cursor()
+    c.execute("DELETE FROM matches WHERE tourney_id = %s", (tourney_id,))
+    conn.commit()
+    conn.close()
+
 
 def deletePlayers(tourney_id=None):
     """

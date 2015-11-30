@@ -24,7 +24,7 @@ CREATE TABLE matches (
 -- A match may only have one player in the case of a bye, so
 -- we're splitting that off into a separate table.
 CREATE TABLE match_results (
-    match_id integer NOT NULL REFERENCES matches,
+    match_id integer NOT NULL REFERENCES matches ON DELETE CASCADE,
     player_id integer NOT NULL REFERENCES players,
     points_awarded integer NOT NULL,
     PRIMARY KEY(match_id, player_id)
