@@ -94,10 +94,31 @@ def registerPlayer(name, tourney_id=None):
     c = conn.cursor()
     c.execute("INSERT INTO players(name) VALUES (%s) RETURNING player_id",(name,))
     player_id = c.fetchone()[0]
+    conn.commit()
+    conn.close()
+
+    attachPlayer(player_id, tourney_id)
+
+def attachPlayer(player_id, tourney_id=None):
+    """
+    Attaches an existing player to the given tournament (does not create
+    a new record in the players table).
+
+    Args:
+        player_id: The id of the player to be added
+        tourney_id = The id of the tournament to which they should be attached.
+    """
+    if not tourney_id:
+        tourney_id = getOrCreateTournament()
+
+    conn = connect()
+    c = conn.cursor()
     c.execute("INSERT INTO tournament_player_maps(tourney_id, player_id) " +
         "VALUES (%s, %s)", (tourney_id, player_id,))
     conn.commit()
     conn.close()
+
+
 
 def playerStandings(tourney_id=None):
     """Returns a list of the players and their win records, sorted by wins.
