@@ -27,7 +27,7 @@ def connect():
 
 def deleteMatches(tourney_id=None):
     """
-    Remove all the match records from the database.
+    Remove all the match records for the given tournament from the database.
 
     Args:
         tourney_id: the id of the currently running tournament
@@ -43,7 +43,18 @@ def deleteMatches(tourney_id=None):
     conn.close()
 
 
-def deletePlayers(tourney_id=None):
+def deletePlayers():
+    """
+    Permanently removes all player records (including the players table).
+    """
+    conn = connect()
+    c = conn.cursor()
+    c.execute("DELETE FROM players")
+    conn.commit()
+    conn.close()
+
+
+def removePlayers(tourney_id=None):
     """
     Remove all the player records from the given tournament
     (but not from the players table).

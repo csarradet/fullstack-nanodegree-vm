@@ -25,7 +25,7 @@ CREATE TABLE matches (
 -- we're splitting that off into a separate table.
 CREATE TABLE match_results (
     match_id integer NOT NULL REFERENCES matches ON DELETE CASCADE,
-    player_id integer NOT NULL REFERENCES players,
+    player_id integer NOT NULL REFERENCES players ON DELETE CASCADE,
     points_awarded integer NOT NULL,
     PRIMARY KEY(match_id, player_id)
 );
@@ -33,7 +33,7 @@ CREATE TABLE match_results (
 -- Listing of all players registered for a given tournament
 CREATE TABLE tournament_player_maps (
     tourney_id integer NOT NULL REFERENCES tournaments,
-    player_id integer NOT NULL REFERENCES players,
+    player_id integer NOT NULL REFERENCES players ON DELETE CASCADE,
     -- Changes to False if the player drops from the tournament
     active boolean DEFAULT true NOT NULL,
     -- Changes to True if the player ever receives a bye during
@@ -41,5 +41,6 @@ CREATE TABLE tournament_player_maps (
     bye_awarded boolean DEFAULT false NOT NULL,
     PRIMARY KEY(tourney_id, player_id)
 );
+
 
 
