@@ -11,6 +11,8 @@
 
 
 
+#TODO: swiss pairings, player rankings
+
 import psycopg2
 import bleach
 
