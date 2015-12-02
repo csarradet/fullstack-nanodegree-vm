@@ -181,6 +181,17 @@ def playerStandings(tourney_id=None):
     if not tourney_id:
         tourney_id = getOrCreateTournament()
 
+    conn = connect()
+    c = conn.cursor()
+    # TODO: temp call
+    c.execute("SELECT player_id, name FROM players")
+    output = []
+    for result in c:
+        output.append((result[0], result[1]))
+    conn.commit()
+    conn.close()
+
+    return output
 
 def reportMatch(winner, loser, tourney_id=None):
     """Records the outcome of a single match between two players.
@@ -309,4 +320,14 @@ def createTournament():
     conn.close()
     return tourney_id
 
+
+# TODO: delete me, temporary debugging function
+def populateTestData():
+    deletePlayers()
+    id1 = registerPlayer("first")
+    id2 = registerPlayer("second")
+    id3 = registerPlayer("third")
+    reportMatch(id1, id2)
+    reportBye(id2)
+    reportDraw(id1, id3)
 

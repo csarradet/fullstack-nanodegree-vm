@@ -22,7 +22,7 @@ CREATE TABLE matches (
 );
 
 -- A match may only have one player in the case of a bye, so
--- we're splitting that off into a separate table.
+-- we're splitting the results off into a separate table.
 CREATE TABLE match_results (
     match_id integer NOT NULL REFERENCES matches ON DELETE CASCADE,
     player_id integer NOT NULL REFERENCES players ON DELETE CASCADE,
@@ -41,6 +41,8 @@ CREATE TABLE tournament_player_maps (
     bye_awarded boolean DEFAULT false NOT NULL,
     PRIMARY KEY(tourney_id, player_id)
 );
+
+
 
 
 
