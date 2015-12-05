@@ -11,7 +11,7 @@
 
 
 
-#TODO: swiss pairings, player rankings
+#TODO: swiss pairings, player rankings, mwp floor
 
 import psycopg2
 import bleach
@@ -126,6 +126,9 @@ def registerPlayer(name, tourney_id=None):
       name: the player's full name (need not be unique).
       tourney_id: the id of the currently running tournament
         (use None to auto-detect the most recent one)
+
+    Returns:
+        The new player's ID number.
     """
     name = bleach.clean(name)
     if not tourney_id:
@@ -139,7 +142,7 @@ def registerPlayer(name, tourney_id=None):
     conn.close()
 
     attachPlayer(player_id, tourney_id)
-
+    return player_id
 
 def attachPlayer(player_id, tourney_id=None):
     """
@@ -237,7 +240,7 @@ def reportDraw(player1, player2, tourney_id=None):
     c.execute("INSERT INTO match_results(match_id, player_id, points_awarded) " +
             "VALUES(%s, %s, %s)", (match_id, player1, DRAW_POINTS))
     c.execute("INSERT INTO match_results(match_id, player_id, points_awarded) " +
-            "VALUES(%s, %s, %s)", (match_id, loser, LOSE_POINTS))
+            "VALUES(%s, %s, %s)", (match_id, player2, DRAW_POINTS))
     conn.commit()
     conn.close()
 
@@ -327,6 +330,7 @@ def populateTestData():
     id1 = registerPlayer("first")
     id2 = registerPlayer("second")
     id3 = registerPlayer("third")
+    reportMatch(id1, id2)
     reportMatch(id1, id2)
     reportBye(id2)
     reportDraw(id1, id3)
