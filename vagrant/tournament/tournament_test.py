@@ -127,7 +127,26 @@ def testPairings():
 
 # If there is an odd number of players, award a bye
 def testByes():
-    pass
+    deleteMatches()
+    deletePlayers()
+    id1 = registerPlayer("Ramza")
+    id2 = registerPlayer("Agrias")
+    id3 = registerPlayer("Delita")
+    id4 = registerPlayer("Gafgarion")
+    pairings = swissPairings()
+    standings = playerStandings()
+    if standings[0][2] != 0:
+        raise ValueError(
+            "For four players, no one should receive a bye")
+
+    deactivatePlayer(id4)
+    pairings = swissPairings()
+    standings = playerStandings()
+    if standings[0][2] == 0:
+        raise ValueError(
+            "For three players, exactly one should receive a bye")
+    print "9. Byes are being awarded when player count is odd"
+
 
 # Support matches that result in a draw
 def testDraws():

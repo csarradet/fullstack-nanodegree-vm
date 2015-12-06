@@ -93,6 +93,22 @@ def deactivatePlayers(tourney_id=None):
     conn.close()
 
 
+def deactivatePlayer(player_id, tourney_id=None):
+    """
+    As above, but for a single player.
+    """
+    if not tourney_id:
+        tourney_id = getOrCreateTournament()
+
+    conn = connect()
+    c = conn.cursor()
+    c.execute("UPDATE tournament_player_maps SET active = False " +
+            "WHERE tourney_id = %s AND player_id = %s",
+            (tourney_id, player_id))
+    conn.commit()
+    conn.close()
+
+
 def countPlayers(tourney_id=None):
     """
     Returns the number of players currently registered.
