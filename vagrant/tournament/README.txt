@@ -29,13 +29,13 @@ https://www.wizards.com/dci/downloads/tiebreakers.pdf
 (largely to save time--I actually play in M:TG tournaments
 already, so I'm familiar with the rules system and many of
 its quirks):
-- A win counts as three points for matchmaking purposes
-- A draw counts as one point
-- A loss counts as zero points
+- A win counts as three points for matchmaking purposes.
+- A draw counts as one point.
+- A loss counts as zero points.
 - When appropriate, byes are awarded to the lowest-ranked
   player who has yet to receive a bye.
 - A bye has the same point value as a win, but doesn't contribute
-  toward's a player's OMW percentage
+  toward's a player's OMW percentage.
 - To account for draws, a player's match win percentage
   is found by dividing their match points by three with a floor
   of 0.33 (to mitigate the impact of playing against extremely
@@ -44,6 +44,7 @@ its quirks):
 
  I changed how the deletePlayers() function works slightly.
  Multiple tourney support means that the player might still be
- enrolled somewhere else, so instead we just mark them as
- inactive within the given tourney and leave their record
- in the players table of the database.
+ enrolled somewhere else, so instead we have several ways of "removing" a player depending on the situation:
+ - Delete their entire player record
+ - Delete their enrollment record from a given tournament
+ - Leave them attached to a tournament, but mark them as inactive for pairing purposes
