@@ -138,8 +138,8 @@ CREATE VIEW player_standings AS
             AND a.tourney_id = c.tourney_id
         LEFT JOIN players d ON a.player_id = d.player_id
     ORDER BY a.tourney_id,
-        b.total_points DESC,
-        c.all_opps_match_win_perc DESC,
+        b.total_points DESC NULLS LAST,
+        c.all_opps_match_win_perc DESC NULLS LAST,
         a.player_id
     ;
 
@@ -162,7 +162,7 @@ CREATE VIEW player_standings_asc AS
             AND a.tourney_id = c.tourney_id
         LEFT JOIN players d ON a.player_id = d.player_id
     ORDER BY a.tourney_id,
-        b.total_points,
-        c.all_opps_match_win_perc,
+        b.total_points NULLS FIRST,
+        c.all_opps_match_win_perc NULLS FIRST,
         a.player_id DESC
     ;

@@ -68,7 +68,8 @@ def removePlayers(tourney_id=None):
 
     conn = connect()
     c = conn.cursor()
-    c.execute("DELETE FROM tournament_player_maps WHERE tourney_id = %s", (tourney_id,))
+    c.execute("DELETE FROM tournament_player_maps WHERE tourney_id = %s",
+        (tourney_id,))
     conn.commit()
     conn.close()
 
@@ -87,7 +88,7 @@ def deactivatePlayers(tourney_id=None):
 
     conn = connect()
     c = conn.cursor()
-    c.execute("UPDATE tournament_player_maps SET active = False " +
+    c.execute("UPDATE tournament_player_maps SET active = false " +
             "WHERE tourney_id = %s", (tourney_id,))
     conn.commit()
     conn.close()
@@ -102,7 +103,7 @@ def deactivatePlayer(player_id, tourney_id=None):
 
     conn = connect()
     c = conn.cursor()
-    c.execute("UPDATE tournament_player_maps SET active = False " +
+    c.execute("UPDATE tournament_player_maps SET active = false " +
             "WHERE tourney_id = %s AND player_id = %s",
             (tourney_id, player_id))
     conn.commit()
@@ -204,7 +205,7 @@ def playerStandings(tourney_id=None):
     c = conn.cursor()
     c.execute("SELECT player_id, name, total_points, matches_played " +
         "FROM player_standings " +
-        "WHERE tourney_id = %s", (tourney_id,))
+        "WHERE tourney_id = %s AND active = true", (tourney_id,))
     output = []
     for result in c:
         # 3 points == 1 match win; doing a conversion here so that
@@ -318,24 +319,24 @@ def swissPairings(tourney_id=None):
     conn = connect()
     c = conn.cursor()
     c.execute("SELECT player_id, name FROM player_standings " +
-        "WHERE tourney_id = %s AND active = 't'",
+        "WHERE tourney_id = %s AND active = true",
         (tourney_id,))
     for result in c:
-        player_list.append((result[0], result[1]))
+        if result[0] == bye_player_id:
+            reportBye(bye_player_id, tourney_id)
+        else:
+            player_list.append((result[0], result[1]))
     conn.commit()
     conn.close()
 
     output = []
     opponent = None
     for player in player_list:
-        if player[0] == bye_player_id:
-            reportBye(bye_player_id, tourney_id)
+        if opponent == None:
+            opponent = player
         else:
-            if opponent == None:
-                opponent = player
-            else:
-                output.append((player[0], player[1], opponent[0], opponent[1]))
-                opponent = None
+            output.append((player[0], player[1], opponent[0], opponent[1]))
+            opponent = None
     return output
 
 
@@ -352,7 +353,7 @@ def calculateBye(tourney_id=None):
     conn = connect()
     c = conn.cursor()
     c.execute("SELECT COUNT(*) FROM player_standings " +
-        "WHERE tourney_id = %s", (tourney_id,))
+        "WHERE tourney_id = %s AND active = true", (tourney_id,))
     count = c.fetchone()[0]
     conn.commit()
     conn.close()
@@ -363,7 +364,7 @@ def calculateBye(tourney_id=None):
     conn = connect()
     c = conn.cursor()
     c.execute("SELECT player_id FROM player_standings_asc " +
-        "WHERE tourney_id = %s AND bye_awarded = 'f' AND active = 't'" +
+        "WHERE tourney_id = %s AND bye_awarded = false AND active = true " +
         "LIMIT 1", (tourney_id,))
     bye_player_id = c.fetchone()[0]
     conn.commit()
