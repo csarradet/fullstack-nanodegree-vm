@@ -324,8 +324,11 @@ def createTournament():
     return tourney_id
 
 
-# TODO: delete me, temporary debugging function
 def populate():
+    """
+    Database debugging function.  Creates a few players and reports dummy
+    matches across multiple tournaments.
+    """
     deletePlayers()
     id1 = registerPlayer("first")
     id2 = registerPlayer("second")
