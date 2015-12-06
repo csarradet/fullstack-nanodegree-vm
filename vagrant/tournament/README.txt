@@ -29,7 +29,7 @@ https://www.wizards.com/dci/downloads/tiebreakers.pdf
 (largely to save time--I actually play in M:TG tournaments
 already, so I'm familiar with the rules system and many of
 its quirks):
-- A win counts as three points for matchmaking purposes.
+- A win counts as three points for matchmaking purposes.  (This slightly changes what counts as a "win" according to the original tests.  Match Win Points are used for the actual matchmaking algorithm, so I did some handwaving to meet the spirit of the original tests that expect, for example, one win after a match)
 - A draw counts as one point.
 - A loss counts as zero points.
 - When appropriate, byes are awarded to the lowest-ranked

@@ -21,7 +21,7 @@ CREATE TABLE matches (
     tourney_id integer NOT NULL REFERENCES tournaments
 );
 
--- A match may only have one player in the case of a bye, so
+-- A match may only have one participating player in the case of a bye, so
 -- we're splitting the results off into a separate table.
 CREATE TABLE match_results (
     match_id integer NOT NULL REFERENCES matches ON DELETE CASCADE,
@@ -44,7 +44,7 @@ CREATE TABLE tournament_player_maps (
 
 
 CREATE VIEW player_match_results AS
-    SELECT a.match_id, a.tourney_id,
+    SELECT a.tourney_id, a.match_id,
         b.player_id, b.points_awarded
     FROM matches a
         RIGHT JOIN match_results b ON (a.match_id = b.match_id)
@@ -63,13 +63,26 @@ CREATE VIEW match_win_perc AS
     ;
 
 
+-- Listing of all the opponents a player has had during a given tournament
 CREATE VIEW opponents AS
-    SELECT DISTINCT a.player_id, b.player_id as opp_id
-    FROM player_match_results a LEFT JOIN player_match_results b
-        ON a.match_id = b.match_id
-    WHERE a.player_id <> b.player_id
-    ORDER BY a.player_id, b.player_id
+    SELECT DISTINCT tourney_id, player_id, opp_id
+    FROM matches c
+    RIGHT JOIN (
+        SELECT a.match_id, a.player_id, b.player_id as opp_id
+        FROM player_match_results a LEFT JOIN player_match_results b
+            ON a.match_id = b.match_id
+        WHERE a.player_id <> b.player_id
+        ) d
+    ON c.match_id = d.match_id
+    ORDER BY player_id, opp_id
     ;
+
+
+
+
+-- Views below this line are still being developed
+
+
 
 CREATE VIEW opp_match_win_perc AS
     SELECT a.tourney_id,
@@ -81,6 +94,6 @@ CREATE VIEW opp_match_win_perc AS
         FROM opponents c
         WHERE c.player_id = a.player_id
         )
-    GROUP BY a.tourney_id, a.player_id
+    GROUP BY a.tourney_id, a.player_id, b.player_id
     ;
 
