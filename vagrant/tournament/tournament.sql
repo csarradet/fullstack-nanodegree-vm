@@ -1,31 +1,31 @@
 -- Initial setup script for the tournament app.
 -- Wipes the database if it exists, then creates a
--- new DB and populates it with the required tables.
+-- new DB and populates it with the required tables/views.
 DROP DATABASE IF EXISTS tournament;
 CREATE DATABASE tournament;
 \c tournament;
 
 
--- **Create tables
+-- Create tables --
 
 -- Listing of all players that have ever registered.
 CREATE TABLE players (
     player_id SERIAL PRIMARY KEY,
     name text NOT NULL
-);
+    );
 
 -- Listing of all tournaments (the top-level entities used
 -- to segment our bracketing and reporting).
 CREATE TABLE tournaments (
     tourney_id SERIAL PRIMARY KEY
-);
+    );
 
 -- Listing of all matches (often between two players) and
 -- the tournaments in which those matches took place.
 CREATE TABLE matches (
     match_id SERIAL PRIMARY KEY,
     tourney_id integer NOT NULL REFERENCES tournaments
-);
+    );
 
 -- Maps the many-to-many relationship between players and the
 -- matches they participate in, and also tracks the number of
@@ -38,7 +38,7 @@ CREATE TABLE match_results (
     player_id integer NOT NULL REFERENCES players ON DELETE CASCADE,
     points_awarded float NOT NULL,
     PRIMARY KEY(match_id, player_id)
-);
+    );
 
 -- Listing of all players registered for a given tournament
 CREATE TABLE tournament_player_maps (
@@ -51,12 +51,12 @@ CREATE TABLE tournament_player_maps (
     -- the course of a tournament.
     bye_awarded boolean DEFAULT false NOT NULL,
     PRIMARY KEY(tourney_id, player_id)
-);
+    );
 
 
--- **Create views
+-- Create views --
 
--- Convenience view; we'll need both tourney_id and match_id later on
+-- Just for convenience; we'll need both tourney_id and match_id later on
 -- when crunching win percentage numbers.
 CREATE VIEW player_match_results AS
     SELECT a.tourney_id, a.match_id,
@@ -77,7 +77,8 @@ CREATE VIEW match_win_perc AS
     GROUP BY tourney_id, player_id
     ;
 
--- Listing of all the opponents a player has had during a given tournament.
+-- Listing of all the opponents a player has been matched with
+-- during a given tournament.
 CREATE VIEW opponents AS
     SELECT DISTINCT tourney_id, player_id, opp_id
     FROM matches c
@@ -93,8 +94,8 @@ CREATE VIEW opponents AS
     ON c.match_id = d.match_id
     ;
 
--- Helper to clean up the next view, shows raw match stats for all of
--- each player's opponents
+-- Helper to clean up the next view, shows raw match stats for
+-- all opponents
 CREATE VIEW omw_subquery AS
     SELECT a.tourney_id, a.player_id, a.opp_id,
         b.matches_played, b.total_points
@@ -117,6 +118,7 @@ CREATE VIEW opp_match_win_perc AS
     GROUP BY a.tourney_id, a.player_id
     ;
 
+-- Most tournament pairing code will use this view.
 -- Contains all fields needed to list the current tournament standings
 CREATE VIEW player_standings AS
     SELECT a.tourney_id,

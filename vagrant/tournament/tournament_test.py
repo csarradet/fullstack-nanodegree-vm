@@ -125,6 +125,22 @@ def testPairings():
     print "8. After one match, players with one win are paired."
 
 
+# If there is an odd number of players, award a bye
+def testByes():
+    pass
+
+# Support matches that result in a draw
+def testDraws():
+    pass
+
+# Support tiebreaks via Opponent Match Win (OMW) percentage
+def testTiebreaks():
+    pass
+
+# Support multiple tournaments
+def testTournaments():
+    pass
+
 if __name__ == '__main__':
     testDeleteMatches()
     testDelete()
@@ -134,6 +150,12 @@ if __name__ == '__main__':
     testStandingsBeforeMatches()
     testReportMatches()
     testPairings()
+    print "Starting extra credit tests..."
+    testByes()
+    testDraws()
+    testTiebreaks()
+    testTournaments()
+
     print "Success!  All tests pass!"
 
 

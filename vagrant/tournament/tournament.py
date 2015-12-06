@@ -320,7 +320,6 @@ def swissPairings(tourney_id=None):
             else:
                 output.append((player[0], player[1], opponent[0], opponent[1]))
                 opponent = None
-    print("\n\nReturning: {}\n\n".format(output))
     return output
 
 
@@ -387,25 +386,3 @@ def createTournament():
     conn.close()
     return tourney_id
 
-
-def populate():
-    """
-    Database debugging function.  Creates a few players and reports dummy
-    matches across multiple tournaments.
-    """
-    deletePlayers()
-    id1 = registerPlayer("first")
-    id2 = registerPlayer("second")
-    id3 = registerPlayer("third")
-    reportMatch(id1, id2)
-    reportMatch(id1, id2)
-    reportBye(id2)
-    reportDraw(id1, id3)
-
-    createTournament()
-    attachPlayer(id1)
-    attachPlayer(id2)
-    attachPlayer(id3)
-    reportMatch(id3, id2)
-    reportMatch(id3, id1)
-    reportBye(id2)
