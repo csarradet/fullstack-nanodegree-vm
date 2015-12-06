@@ -75,7 +75,6 @@ CREATE VIEW match_win_perc AS
         SUM(points_awarded) / (3 * COUNT(*)) AS match_win_perc
     FROM player_match_results
     GROUP BY tourney_id, player_id
-    ORDER BY tourney_id, player_id
     ;
 
 -- Listing of all the opponents a player has had during a given tournament.
@@ -102,6 +101,7 @@ CREATE VIEW omw_subquery AS
     FROM opponents a
     LEFT JOIN match_win_perc b
     ON a.opp_id = b.player_id
+    WHERE a.tourney_id = b.tourney_id
     ;
 
 -- The aggregate match win percentage of a player's opponents during
@@ -115,7 +115,6 @@ CREATE VIEW opp_match_win_perc AS
             AS all_opps_match_win_perc
     FROM omw_subquery a
     GROUP BY a.tourney_id, a.player_id
-    ORDER BY a.tourney_id, a.player_id
     ;
 
 
