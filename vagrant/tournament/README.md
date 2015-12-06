@@ -31,11 +31,11 @@ already, so I'm familiar with the pairing system):
    test cases.  Match Win Points are used for the actual matchmaking
    algorithm, so I did some handwaving to meet the spirit of the
    tests that expect, for example, one win after a match)
-- A draw counts as one point.
-- A loss counts as zero points.
-- When appropriate, byes are awarded to the lowest-ranked
+ - A draw counts as one point.
+ - A loss counts as zero points.
+ - When appropriate, byes are awarded to the lowest-ranked
   active player who has yet to receive a bye.
-- A bye has the same point value as a win, but doesn't contribute
+ - A bye has the same point value as a win, but doesn't contribute
   toward's a player's OMW percentage.
 
 
@@ -50,9 +50,10 @@ already, so I'm familiar with the pairing system):
  - Tiebreakers are decided by OMW percentage; even if a player
    drops from the tournament, their records are still relevant to
    other players.
+
  Instead of the stock behavior (option 1 below), we now have
  three ways of "removing" a player depending on the situation:
- 1. Delete their entire player record.
- 2. Delete their enrollment record for a given tournament.
- 3. Leave them attached to a tournament, but mark them as inactive for pairing
+ - Delete their entire player record.
+ - Delete their enrollment record for a given tournament.
+ - Leave them attached to a tournament, but mark them as inactive for pairing
     purposes (preferred).
