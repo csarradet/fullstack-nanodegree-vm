@@ -63,7 +63,6 @@ CREATE VIEW player_match_results AS
         b.player_id, b.points_awarded
     FROM matches a
         RIGHT JOIN match_results b ON (a.match_id = b.match_id)
-    ORDER BY b.player_id
     ;
 
 -- A player's match win percentage during a given tournament
@@ -83,46 +82,39 @@ CREATE VIEW opponents AS
     SELECT DISTINCT tourney_id, player_id, opp_id
     FROM matches c
     RIGHT JOIN (
-        SELECT a.match_id, a.player_id, b.player_id AS opp_id
+        SELECT a.match_id,
+            a.player_id,
+            b.player_id AS opp_id
         FROM player_match_results a
         LEFT JOIN player_match_results b
         ON a.match_id = b.match_id
         WHERE a.player_id <> b.player_id
         ) d
     ON c.match_id = d.match_id
-    ORDER BY player_id, opp_id
     ;
 
+-- Helper to clean up the next view, shows raw match stats for all of
+-- each player's opponents
+CREATE VIEW omw_subquery AS
+    SELECT a.tourney_id, a.player_id, a.opp_id,
+        b.matches_played, b.total_points
+    FROM opponents a
+    LEFT JOIN match_win_perc b
+    ON a.opp_id = b.player_id
+    ;
 
-
-
--- Views below this line are still being developed
-
+-- The aggregate match win percentage of a player's opponents during
+-- a given tournament (using the DCI's scoring method)
 CREATE VIEW opp_match_win_perc AS
     SELECT a.tourney_id,
-        a.player_id
-    FROM match_win_perc a
-    LEFT JOIN (
-        SELECT inner.tourney_id,
-            inner.player_id,
-            SUM(inner.matches_played) as mp_sum,
-            SUM(inner.total_points) as point_sum
-        FROM match_win_perc inner
-        WHERE inner.tourney_id = a.tourney_id
-            AND
-        ) b
-
+        a.player_id,
+        SUM(a.matches_played) as all_opps_matches_played,
+        SUM(a.total_points) as all_opps_total_points,
+        SUM(a.total_points) / (3 * SUM(a.matches_played))
+            AS all_opps_match_win_perc
+    FROM omw_subquery a
+    GROUP BY a.tourney_id, a.player_id
     ;
-
-
-
- tourney_id | player_id | opp_id | opp_matches_played | opp_total_points | opp_match_win_perc
-------------+-----------+--------+--------------------+------------------+--------------------
-          1 |         1 |      2 |                  3 |                3 |  0.333333333333333
-          1 |         1 |      3 |                  1 |                1 |  0.333333333333333
-          1 |         2 |      1 |                  3 |                7 |  0.777777777777778
-          1 |         3 |      1 |                  3 |                7 |  0.777777777777778
-(4 rows)
 
 
 

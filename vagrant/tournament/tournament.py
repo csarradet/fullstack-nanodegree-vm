@@ -325,7 +325,7 @@ def createTournament():
 
 
 # TODO: delete me, temporary debugging function
-def populateTestData():
+def populate():
     deletePlayers()
     id1 = registerPlayer("first")
     id2 = registerPlayer("second")
@@ -335,3 +335,10 @@ def populateTestData():
     reportBye(id2)
     reportDraw(id1, id3)
 
+    createTournament()
+    attachPlayer(id1)
+    attachPlayer(id2)
+    attachPlayer(id3)
+    reportMatch(id3, id2)
+    reportMatch(id3, id1)
+    reportBye(id2)
