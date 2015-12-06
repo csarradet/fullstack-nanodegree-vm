@@ -1,4 +1,4 @@
-This project contains the files necessary to run a tournament bracketing system as described in FSWD-Project 2.  From the course's preconfigured Vagrant VM, run the following commands to prepare the database for incoming connections:
+This project contains the files necessary to run a tournament bracketing system as described in FSND-Project 2.  From the course's preconfigured Vagrant VM, run the following commands to prepare the database for incoming connections:
     (browse to the project directory)
     > psql
     > \i tournament.sql
