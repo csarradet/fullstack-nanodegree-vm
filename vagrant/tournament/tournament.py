@@ -302,7 +302,7 @@ def swissPairings(tourney_id=None):
     conn = connect()
     c = conn.cursor()
     c.execute("SELECT player_id, name FROM player_standings " +
-        "WHERE tourney_id = %s AND active = 't' LIMIT 1",
+        "WHERE tourney_id = %s AND active = 't'",
         (tourney_id,))
     for result in c:
         player_list.append((result[0], result[1]))
@@ -320,6 +320,7 @@ def swissPairings(tourney_id=None):
             else:
                 output.append((player[0], player[1], opponent[0], opponent[1]))
                 opponent = None
+    print("\n\nReturning: {}\n\n".format(output))
     return output
 
 
