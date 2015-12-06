@@ -69,8 +69,9 @@ CREATE VIEW opponents AS
     FROM matches c
     RIGHT JOIN (
         SELECT a.match_id, a.player_id, b.player_id as opp_id
-        FROM player_match_results a LEFT JOIN player_match_results b
-            ON a.match_id = b.match_id
+        FROM player_match_results a
+        LEFT JOIN player_match_results b
+        ON a.match_id = b.match_id
         WHERE a.player_id <> b.player_id
         ) d
     ON c.match_id = d.match_id
@@ -82,18 +83,24 @@ CREATE VIEW opponents AS
 
 -- Views below this line are still being developed
 
-
-
 CREATE VIEW opp_match_win_perc AS
     SELECT a.tourney_id,
         a.player_id,
-        b.player_id
-    FROM match_win_perc a, match_win_perc b
-    WHERE b.player_id IN (
-        SELECT opp_id
-        FROM opponents c
-        WHERE c.player_id = a.player_id
-        )
-    GROUP BY a.tourney_id, a.player_id, b.player_id
+        a.opp_id,
+    FROM opponents a
+    LEFT JOIN match_win_perc b
+    ON a.opp_id = b.player_id
     ;
+
+
+
+ tourney_id | player_id | opp_id | opp_matches_played | opp_total_points | opp_match_win_perc
+------------+-----------+--------+--------------------+------------------+--------------------
+          1 |         1 |      2 |                  3 |                3 |  0.333333333333333
+          1 |         1 |      3 |                  1 |                1 |  0.333333333333333
+          1 |         2 |      1 |                  3 |                7 |  0.777777777777778
+          1 |         3 |      1 |                  3 |                7 |  0.777777777777778
+(4 rows)
+
+
 

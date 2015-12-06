@@ -42,9 +42,14 @@ its quirks):
   weak players).
 
 
- I changed how the deletePlayers() function works slightly.
- Multiple tourney support means that the player might still be
- enrolled somewhere else, so instead we have several ways of "removing" a player depending on the situation:
- - Delete their entire player record
- - Delete their enrollment record from a given tournament
- - Leave them attached to a tournament, but mark them as inactive for pairing purposes
+ I changed how the deletePlayers() function works slightly,
+ for two reasons:
+ - Multiple tourney support means that the player might still be
+ enrolled somewhere else, so we shouldn't delete them entirely
+ - Tiebreakers are decided by OMW percentage; even if a player
+   drops from the tournament, their records are still relevant
+ Instead of the stock behavior (option 1 below), we now have
+ three ways of "removing" a player depending on the situation:
+ 1. Delete their entire player record
+ 2. Delete their enrollment record for a given tournament
+ 3. Leave them attached to a tournament, but mark them as inactive for pairing purposes
