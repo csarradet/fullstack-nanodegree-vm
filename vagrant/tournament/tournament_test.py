@@ -157,11 +157,57 @@ def testByes():
 
 # Support matches that result in a draw
 def testDraws():
-    pass
+    deleteMatches()
+    deletePlayers()
+    id1 = registerPlayer("Pacquiao")
+    id2 = registerPlayer("Marquez")
+    reportDraw(id1, id2)
+    for record in playerStandings():
+        if record[2] != (1.0/3.0):
+            raise ValueError(
+                "Both players should have one match win point after " +
+                "a draw (found {}, expected 0.333...)".format(record[2]))
+    print "10. Draws are being awarded correctly"
+
 
 # Support tiebreaks via Opponent Match Win (OMW) percentage
 def testTiebreaks():
-    pass
+    deleteMatches()
+    deletePlayers()
+    id1 = registerPlayer("Saber")
+    id2 = registerPlayer("Lancer")
+    id3 = registerPlayer("Assassin")
+    id4 = registerPlayer("Rider")
+    reportMatch(id1, id3)
+    reportMatch(id2, id4)
+    reportMatch(id1, id2)
+
+    curr_rank = 1
+    ranks = {}
+    for record in playerStandings():
+        ranks[record[0]] = curr_rank
+        curr_rank += 1
+    if ranks[id3] > ranks[id4]:
+        raise ValueError(
+            "When match points are tied, opponent match win " +
+            "percentage should be used as a tiebreaker " +
+            "({} < {})".format(ranks[id3], ranks[id4]))
+
+    # Reversing the results to ensure that wasn't a fluke
+    reportMatch(id2, id1)
+    reportMatch(id2, id1)
+    curr_rank = 1
+    ranks = {}
+    for record in playerStandings():
+        ranks[record[0]] = curr_rank
+        curr_rank += 1
+    if ranks[id3] < ranks[id4]:
+        raise ValueError(
+            "When match points are tied, opponent match win " +
+            "percentage should be used as a tiebreaker " +
+            "({} < {})".format(ranks[id4], ranks[id3]))
+    print "11.  OMW percentage is being used as a tiebreaker"
+
 
 # Support multiple tournaments
 def testTournaments():
