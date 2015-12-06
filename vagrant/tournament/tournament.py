@@ -25,6 +25,25 @@ def connect():
     return psycopg2.connect("dbname=tournament")
 
 
+def wipeDatabase():
+    """
+    Removes *everything* from the database.
+    """
+    deleteTournaments()
+    deleteMatches()
+    deletePlayers()
+
+def deleteTournaments():
+    """
+    Remove all tournaments from the database.
+    """
+    conn = connect()
+    c = conn.cursor()
+    c.execute("DELETE FROM tournaments")
+    conn.commit()
+    conn.close()
+
+
 def deleteMatches(tourney_id=None):
     """
     Remove all the match records for the given tournament from the database.

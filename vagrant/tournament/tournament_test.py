@@ -16,8 +16,7 @@ def testDelete():
 
 
 def testCount():
-    deleteMatches()
-    deletePlayers()
+    wipeDatabase()
     c = countPlayers()
     if c == '0':
         raise TypeError(
@@ -28,8 +27,7 @@ def testCount():
 
 
 def testRegister():
-    deleteMatches()
-    deletePlayers()
+    wipeDatabase()
     registerPlayer("Chandra Nalaar")
     c = countPlayers()
     if c != 1:
@@ -39,8 +37,7 @@ def testRegister():
 
 
 def testRegisterCountDelete():
-    deleteMatches()
-    deletePlayers()
+    wipeDatabase()
     registerPlayer("Markov Chaney")
     registerPlayer("Joe Malik")
     registerPlayer("Mao Tsu-hsi")
@@ -57,8 +54,7 @@ def testRegisterCountDelete():
 
 
 def testStandingsBeforeMatches():
-    deleteMatches()
-    deletePlayers()
+    wipeDatabase()
     registerPlayer("Melpomene Murray")
     registerPlayer("Randy Schwartz")
     standings = playerStandings()
@@ -80,8 +76,7 @@ def testStandingsBeforeMatches():
 
 
 def testReportMatches():
-    deleteMatches()
-    deletePlayers()
+    wipeDatabase()
     registerPlayer("Bruno Walton")
     registerPlayer("Boots O'Neal")
     registerPlayer("Cathy Burton")
@@ -102,8 +97,7 @@ def testReportMatches():
 
 
 def testPairings():
-    deleteMatches()
-    deletePlayers()
+    wipeDatabase()
     registerPlayer("Twilight Sparkle")
     registerPlayer("Fluttershy")
     registerPlayer("Applejack")
@@ -128,8 +122,7 @@ def testPairings():
 # If there is an odd number of players, award a bye
 # (also tests deactivating players)
 def testByes():
-    deleteMatches()
-    deletePlayers()
+    wipeDatabase()
     id1 = registerPlayer("Ramza")
     id2 = registerPlayer("Agrias")
     id3 = registerPlayer("Delita")
@@ -157,8 +150,7 @@ def testByes():
 
 # Support matches that result in a draw
 def testDraws():
-    deleteMatches()
-    deletePlayers()
+    wipeDatabase()
     id1 = registerPlayer("Pacquiao")
     id2 = registerPlayer("Marquez")
     reportDraw(id1, id2)
@@ -172,8 +164,7 @@ def testDraws():
 
 # Support tiebreaks via Opponent Match Win (OMW) percentage
 def testTiebreaks():
-    deleteMatches()
-    deletePlayers()
+    wipeDatabase()
     id1 = registerPlayer("Saber")
     id2 = registerPlayer("Lancer")
     id3 = registerPlayer("Assassin")
@@ -211,7 +202,23 @@ def testTiebreaks():
 
 # Support multiple tournaments
 def testTournaments():
-    pass
+    wipeDatabase()
+    t1 = createTournament()
+    p1 = registerPlayer("Bilbo")
+    p2 = registerPlayer("Gandalf")
+    t2 = createTournament()
+    p3 = registerPlayer("Frodo")
+    p4 = registerPlayer("Sam")
+    p5 = registerPlayer("Merry")
+    p6 = registerPlayer("Pippin")
+    attachPlayer(p2, t2)
+    if countPlayers(t1) != 2:
+        raise ValueError(
+            "The first tournament should have two players")
+    if countPlayers(t2) != 5:
+        raise ValueError(
+            "The second tournament should have five players")
+    print "12. Multiple tournaments can be created"
 
 if __name__ == '__main__':
     testDeleteMatches()

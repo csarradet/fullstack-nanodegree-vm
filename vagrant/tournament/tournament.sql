@@ -1,6 +1,10 @@
 -- Initial setup script for the tournament app.
 -- Wipes the database if it exists, then creates a
 -- new DB and populates it with the required tables/views.
+
+-- The ON DELETE CASCADE bits are only here to make the
+-- test code simpler; in production, they would be replaced
+-- with more robust safety measures in the application code.
 DROP DATABASE IF EXISTS tournament;
 CREATE DATABASE tournament;
 \c tournament;
@@ -24,7 +28,7 @@ CREATE TABLE tournaments (
 -- the tournaments in which those matches took place.
 CREATE TABLE matches (
     match_id SERIAL PRIMARY KEY,
-    tourney_id integer NOT NULL REFERENCES tournaments
+    tourney_id integer NOT NULL REFERENCES tournaments ON DELETE CASCADE
     );
 
 -- Maps the many-to-many relationship between players and the
@@ -42,7 +46,7 @@ CREATE TABLE match_results (
 
 -- Listing of all players registered for a given tournament
 CREATE TABLE tournament_player_maps (
-    tourney_id integer NOT NULL REFERENCES tournaments,
+    tourney_id integer NOT NULL REFERENCES tournaments ON DELETE CASCADE,
     player_id integer NOT NULL REFERENCES players ON DELETE CASCADE,
     -- Changes to False if the player drops from the tournament.
     -- Inactive players still contribute to tiebreaks, but aren't paired.
