@@ -17,6 +17,9 @@ added to the default suite to demonstrate functionality:
  - Support multiple tournaments
 
 
+---------------------
+
+
 The following assumptions are taken from the provided
 WotC document describing the DCI's Swiss pairing system
 and this doc on resolving tiebreakers:
@@ -34,6 +37,9 @@ already, so I'm familiar with the pairing system):
   active player who has yet to receive a bye.
 - A bye has the same point value as a win, but doesn't contribute
   toward's a player's OMW percentage.
+
+
+---------------------
 
 
  I slightly changed how the deletePlayers() function works,
