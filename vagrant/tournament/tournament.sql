@@ -117,5 +117,50 @@ CREATE VIEW opp_match_win_perc AS
     GROUP BY a.tourney_id, a.player_id
     ;
 
+-- Contains all fields needed to list the current tournament standings
+CREATE VIEW player_standings AS
+    SELECT a.tourney_id,
+        a.player_id,
+        a.active,
+        a.bye_awarded,
+        b.matches_played,
+        b.total_points,
+        c.all_opps_match_win_perc,
+        d.name
+    FROM tournament_player_maps a
+        LEFT JOIN match_win_perc b
+            ON a.player_id = b.player_id
+            AND a.tourney_id = b.tourney_id
+        LEFT JOIN opp_match_win_perc c
+            ON a.player_id = c.player_id
+            AND a.tourney_id = c.tourney_id
+        LEFT JOIN players d ON a.player_id = d.player_id
+    ORDER BY a.tourney_id,
+        b.total_points DESC,
+        c.all_opps_match_win_perc DESC,
+        a.player_id
+    ;
 
-
+-- Same as above with reversed sorting.  Only used to calculate byes
+CREATE VIEW player_standings_asc AS
+    SELECT a.tourney_id,
+        a.player_id,
+        a.active,
+        a.bye_awarded,
+        b.matches_played,
+        b.total_points,
+        c.all_opps_match_win_perc,
+        d.name
+    FROM tournament_player_maps a
+        LEFT JOIN match_win_perc b
+            ON a.player_id = b.player_id
+            AND a.tourney_id = b.tourney_id
+        LEFT JOIN opp_match_win_perc c
+            ON a.player_id = c.player_id
+            AND a.tourney_id = c.tourney_id
+        LEFT JOIN players d ON a.player_id = d.player_id
+    ORDER BY a.tourney_id,
+        b.total_points,
+        c.all_opps_match_win_perc,
+        a.player_id DESC
+    ;

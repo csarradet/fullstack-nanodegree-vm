@@ -186,11 +186,16 @@ def playerStandings(tourney_id=None):
 
     conn = connect()
     c = conn.cursor()
-    # TODO: temp call
-    c.execute("SELECT player_id, name FROM players")
+    c.execute("SELECT player_id, name, total_points, matches_played " +
+        "FROM player_standings " +
+        "WHERE tourney_id = %s", (tourney_id,))
     output = []
     for result in c:
-        output.append((result[0], result[1]))
+        # 3 points == 1 match win; doing a conversion here so that
+        # the test cases will see a win count in the format they expect
+        points = result[2] or 0
+        matches = result[3] or 0
+        output.append((result[0], result[1], float(points)/3, matches))
     conn.commit()
     conn.close()
 
@@ -291,6 +296,64 @@ def swissPairings(tourney_id=None):
     if not tourney_id:
         tourney_id = getOrCreateTournament()
 
+    bye_player_id = calculateBye(tourney_id)
+
+    player_list = []
+    conn = connect()
+    c = conn.cursor()
+    c.execute("SELECT player_id, name FROM player_standings " +
+        "WHERE tourney_id = %s AND active = 't' LIMIT 1",
+        (tourney_id,))
+    for result in c:
+        player_list.append((result[0], result[1]))
+    conn.commit()
+    conn.close()
+
+    output = []
+    opponent = None
+    for player in player_list:
+        if player[0] == bye_player_id:
+            reportBye(bye_player_id, tourney_id)
+        else:
+            if opponent == None:
+                opponent = player
+            else:
+                output.append((player[0], player[1], opponent[0], opponent[1]))
+                opponent = None
+    return output
+
+
+def calculateBye(tourney_id=None):
+    """
+    If the current tournament has an odd number of active players,
+    returns the ID of the lowest-ranked player who has yet to receive
+    a bye.
+    Otherwise, returns None
+    """
+    if not tourney_id:
+        tourney_id = getOrCreateTournament()
+
+    conn = connect()
+    c = conn.cursor()
+    c.execute("SELECT COUNT(*) FROM player_standings " +
+        "WHERE tourney_id = %s", (tourney_id,))
+    count = c.fetchone()[0]
+    conn.commit()
+    conn.close()
+
+    if count % 2 == 0:
+        return None
+
+    conn = connect()
+    c = conn.cursor()
+    c.execute("SELECT player_id FROM player_standings_asc " +
+        "WHERE tourney_id = %s AND bye_awarded = 'f' AND active = 't'" +
+        "LIMIT 1", (tourney_id,))
+    bye_player_id = c.fetchone()[0]
+    conn.commit()
+    conn.close()
+
+    return bye_player_id
 
 
 def getOrCreateTournament():
