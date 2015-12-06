@@ -36,14 +36,14 @@ already, so I'm familiar with the pairing system):
  - When appropriate, byes are awarded to the lowest-ranked
   active player who has yet to receive a bye.
  - A bye has the same point value as a win, but doesn't contribute
-  toward's a player's OMW percentage.
+  towards a player's OMW percentage.
 
 
 ---------------------
 
 
- I slightly changed how the deletePlayers() function works,
- for two reasons:
+I slightly changed how the deletePlayers() function works,
+for two reasons:
  - Multiple tourney support means that the player might still be
    enrolled somewhere else, so it's possible we shouldn't delete
    them entirely.
@@ -51,8 +51,8 @@ already, so I'm familiar with the pairing system):
    drops from the tournament, their records are still relevant to
    other players.
 
- Instead of the stock behavior (option 1 below), we now have
- three ways of "removing" a player depending on the situation:
+Instead of the stock behavior (option 1 below), we now have
+three ways of "removing" a player depending on the situation:
  - Delete their entire player record.
  - Delete their enrollment record for a given tournament.
  - Leave them attached to a tournament, but mark them as inactive for pairing
