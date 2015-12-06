@@ -4,6 +4,7 @@
 
 from tournament import *
 
+
 def testDeleteMatches():
     deleteMatches()
     print "1. Old matches can be deleted."
@@ -220,6 +221,7 @@ def testTournaments():
             "The second tournament should have five players")
     print "12. Multiple tournaments can be created"
 
+
 if __name__ == '__main__':
     testDeleteMatches()
     testDelete()
@@ -236,5 +238,3 @@ if __name__ == '__main__':
     testTournaments()
 
     print "Success!  All tests pass!"
-
-

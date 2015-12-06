@@ -9,7 +9,8 @@ Once that is complete, run tournament_test.py to check our test cases.
 ---------------------
 
 
-The following extra credit goals were attempted:
+The following extra credit goals were attempted.  Test cases have been
+added to the default suite to demonstrate functionality:
  - If there is an odd number of players, award a bye
  - Support matches that result in a draw
  - Support tiebreaks via Opponent Match Win (OMW) percentage
@@ -30,7 +31,7 @@ already, so I'm familiar with the pairing system):
 - A draw counts as one point.
 - A loss counts as zero points.
 - When appropriate, byes are awarded to the lowest-ranked
-  player who has yet to receive a bye.
+  active player who has yet to receive a bye.
 - A bye has the same point value as a win, but doesn't contribute
   toward's a player's OMW percentage.
 
@@ -48,4 +49,4 @@ already, so I'm familiar with the pairing system):
  1. Delete their entire player record.
  2. Delete their enrollment record for a given tournament.
  3. Leave them attached to a tournament, but mark them as inactive for pairing
-    purposes.
+    purposes (preferred).

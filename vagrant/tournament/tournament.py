@@ -16,6 +16,7 @@
 import psycopg2
 import bleach
 
+
 WIN_POINTS = 3
 DRAW_POINTS = 1
 LOSE_POINTS = 0
@@ -27,11 +28,12 @@ def connect():
 
 def wipeDatabase():
     """
-    Removes *everything* from the database.
+    Remove *everything* from the database.
     """
     deleteTournaments()
     deleteMatches()
     deletePlayers()
+
 
 def deleteTournaments():
     """
@@ -180,6 +182,7 @@ def registerPlayer(name, tourney_id=None):
     attachPlayer(player_id, tourney_id)
     return player_id
 
+
 def attachPlayer(player_id, tourney_id=None):
     """
     Attaches an existing player to the given tournament (does not create
@@ -236,6 +239,7 @@ def playerStandings(tourney_id=None):
     conn.close()
 
     return output
+
 
 def reportMatch(winner, loser, tourney_id=None):
     """Records the outcome of a single match between two players.
