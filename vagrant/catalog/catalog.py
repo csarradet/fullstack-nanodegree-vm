@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 app = Flask(__name__)
 import logging
 logger = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ def HelloWorld():
 @app.route('/users')
 def UserList():
     user_list = dal.get_users()
-    return "<br>".join((pprint.pformat(vars(x)) for x in user_list))
+    return render_template("user_list.html", users=user_list)
 
 
 if __name__ == '__main__':

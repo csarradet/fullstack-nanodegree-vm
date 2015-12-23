@@ -57,6 +57,18 @@ def load_dummy_data():
         cursor.execute('INSERT INTO users VALUES (null, "dummy2@user.com", "fake_auth_source")')
 
 
+def model_from_row(model_class, row):
+    """
+    Converts a database row into a new instance of type model_class.
+    Assumes that every column in the row corresponds to a field in
+    model_class that has the same spelling and can be copied verbatim.
+    """
+    model = model_class()
+    for field in row.keys():
+        setattr(model, field, row[field])
+    return model
+
+
 def get_users():
     output = []
     with get_cursor() as cursor:
@@ -66,16 +78,6 @@ def get_users():
         output.append(model_from_row(User, row))
     return output
 
-
-def model_from_row(model_class, row):
-    """
-    Converts a database row into a usable instance of type model_class.
-    Assumes a 1:1 mapping between model_class data members and DB column names.
-    """
-    model = model_class()
-    for field in row.keys():
-        setattr(model, field, row[field])
-    return model
 
 
 
