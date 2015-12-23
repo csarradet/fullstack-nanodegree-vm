@@ -12,10 +12,15 @@ def HelloWorld():
     return "Hello world"
 
 
-@app.route('/users')
+@app.route('/users/list')
 def UserList():
     user_list = dal.get_users()
     return render_template("user_list.html", users=user_list)
+
+@app.route('/users/<int:user_id>/')
+def UserLookup(user_id):
+    user = [dal.get_user(user_id)]
+    return render_template("user_list.html", users=user)
 
 
 if __name__ == '__main__':

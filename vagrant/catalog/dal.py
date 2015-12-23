@@ -78,6 +78,12 @@ def get_users():
         output.append(model_from_row(User, row))
     return output
 
+def get_user(user_id):
+    output = None
+    with get_cursor() as cursor:
+        cursor.execute('SELECT * FROM users WHERE user_id = ?', (user_id,))
+        output = model_from_row(User, cursor.fetchone())
+    return output
 
 
 
