@@ -62,6 +62,9 @@ def model_from_row(model_class, row):
     Converts a database row into a new instance of type model_class.
     Assumes that every column in the row corresponds to a field in
     model_class that has the same spelling and can be copied verbatim.
+
+    Note that this will only work for very simple models; anything
+    more complex should have its own converter.
     """
     model = model_class()
     for field in row.keys():

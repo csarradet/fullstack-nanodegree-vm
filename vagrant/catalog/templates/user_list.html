@@ -1,8 +1,7 @@
-<html>
-<body>
+{% extends "template_base.html" %}
+
+{% block content %}
     {% for i in users %}
     {{ i.user_id }}: {{ i.email }} // {{ i.auth_source}}<br>
     {% endfor %}
-</body>
-</html>
-
+{% endblock %}
