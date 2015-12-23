@@ -1,8 +1,8 @@
 from flask import Flask
 app = Flask(__name__)
-
 import logging
 logger = logging.getLogger(__name__)
+import pprint
 
 import dal
 
@@ -15,7 +15,7 @@ def HelloWorld():
 @app.route('/users')
 def UserList():
     user_list = dal.get_users()
-    return "<br>".join((x.pretty_print() for x in user_list))
+    return "<br>".join((pprint.pformat(vars(x)) for x in user_list))
 
 
 if __name__ == '__main__':

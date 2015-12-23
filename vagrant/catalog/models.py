@@ -3,6 +3,15 @@ class User(object):
     email = None
     auth_source = None
 
-    def pretty_print(self):
-        return "user_id: {}, email: {}, auth_source: {}".format(
-            self.user_id, self.email, self.auth_source)
+
+class Category(object):
+    cat_id = None
+    name = None
+    creator_id = None
+
+
+class Item(object):
+    item_id = None
+    name = None
+    cat_id = None
+    creator_id = None

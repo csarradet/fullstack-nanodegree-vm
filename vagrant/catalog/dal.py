@@ -75,8 +75,6 @@ def model_from_row(model_class, row):
     model = model_class()
     for field in row.keys():
         setattr(model, field, row[field])
-        print("Set field {} to ".format(field, row[field]))
-    print("Converted row {}\nto model {}".format(row, model.pretty_print()))
     return model
 
 
