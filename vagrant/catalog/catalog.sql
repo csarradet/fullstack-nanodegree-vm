@@ -9,9 +9,12 @@ DROP TABLE IF EXISTS items;
 
 -- Create tables --
 CREATE TABLE users (
+    -- The user's unique ID within our own system
     user_id INTEGER PRIMARY KEY,
     email TEXT NOT NULL,
-    auth_source TEXT NOT NULL
+    auth_source TEXT NOT NULL,
+    -- The user's unique ID, as reported by the auth source
+    auth_source_id TEXT NOT NULL
     );
 
 CREATE TABLE categories (

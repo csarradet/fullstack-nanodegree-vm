@@ -42,6 +42,7 @@ def setup_db():
     Uses a code snippet from http://stackoverflow.com/questions/2380553/sqlite-run-multi-line-sql-script-from-file
     """
     print("Setting up DB")
+    print(" - Clearing existing data")
     print(" - Creating tables and views")
     qry = open("catalog.sql", "r").read()
     with get_cursor() as cursor:
@@ -53,8 +54,11 @@ def setup_db():
 
 def load_dummy_data():
     with get_cursor() as cursor:
-        cursor.execute('INSERT INTO users VALUES (null, "dummy1@user.com", "fake_auth_source")')
-        cursor.execute('INSERT INTO users VALUES (null, "dummy2@user.com", "fake_auth_source")')
+        auth = "fake_auth_source"
+        email = "dummy1@user.com"
+        cursor.execute('INSERT INTO users VALUES (null, ?, ?, ?)', (email, auth, email,))
+        email = "dummy2@user.com"
+        cursor.execute('INSERT INTO users VALUES (null, ?, ?, ?)', (email, auth, email,))
 
 
 def model_from_row(model_class, row):
@@ -80,6 +84,7 @@ def get_users():
     for row in result:
         output.append(model_from_row(User, row))
     return output
+
 
 def get_user(user_id):
     output = None
