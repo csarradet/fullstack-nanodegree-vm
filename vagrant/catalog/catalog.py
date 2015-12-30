@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 from flask import (
     Flask,
+    flash,
     make_response,
     render_template,
     request,
@@ -52,12 +53,14 @@ def showLogin():
 def gconnect():
     if request.args.get('state') != session["state"]:
         return create_err_response(
-            "Invalid state parameter ({} vs. {})".format(request.args.get('state'), session['state']),
+            "Invalid state parameter ([{}] vs. [{}])".format(request.args.get('state'), session['state']),
             401)
     code = request.data
     try:
+        scope = "email profile"
+
         # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets("client_secrets.json", scope="")
+        oauth_flow = flow_from_clientsecrets("client_secrets.json", scope=scope)
         oauth_flow.redirect_uri = "postmessage"
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
@@ -83,28 +86,34 @@ def gconnect():
         return create_err_response("Current user is already connected", 200)
 
     # Store the access token in the session for later use.
-    session["credentials"] = credentials
+    session["credentials"] = credentials.to_json()
     session["gplus_id"] = gplus_id
 
     # Get user info
-    userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
-    params = {"access_token": credentials.access_token, "alt":"json"}
-    answer = requests.get(userinfo_url, params=params)
-    data = json.loads(answer.text)
+    try:
+        answer = None
+        data = None
 
-    session["username"] = data["username"]
-    session["picture"] = data["picture"]
-    session["email"] = data["email"]
-
+        userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+        params = {"access_token": credentials.access_token, "alt":"json"}
+        answer = requests.get(userinfo_url, params=params)
+        data = json.loads(answer.text)
+        session["username"] = data["name"]
+        session["picture"] = data["picture"]
+        session["email"] = data["email"]
+    except Exception:
+        return create_err_response(
+            "Received invalid user data\n\nanswer.text: {}\n\ndata: {}".format(
+                answer.text, data), 401)
     output = (
         "<h1>Welcome, " +
         session["username"] +
         "!</h1>" +
         "<img src='" +
-        login_session["picture"] +
+        session["picture"] +
         "' style = 'width: 300px; height: 300px; border-radius: 150px; -webkit-border-radius: 150px; -moz-border-radius: 150px;'> "
         )
-    flash("you are now logged in as %s" % login_session["username"])
+    flash("you are now logged in as %s" % session["username"])
     return output
 
 
