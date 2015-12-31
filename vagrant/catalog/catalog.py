@@ -34,6 +34,7 @@ class SessionKeys(object):
     CURRENT_USER = "current_user"
     CREDENTIALS = "credentials"
     GPLUS_ID = "gplus_id"
+    STATE = "state"
 
 def save_to_session(key, obj):
     """ Converts the object to a serializable format and stores it in a Flask session. """
@@ -42,6 +43,8 @@ def save_to_session(key, obj):
 def load_from_session(key):
     """ Loads serialized data from a Flask session and converts it back into an object. """
     return json.loads(session[key])
+
+
 
 
 @app.route('/static/<path:filename>')
@@ -77,15 +80,16 @@ def logout():
 def showLogin():
     state = "".join(random.choice(string.ascii_uppercase +
         string.digits) for x in xrange(32))
-    session["state"] = state
+    session[SessionKeys.STATE] = state
     return render("login.html", STATE=state)
 
 
 @app.route('/gconnect', methods=["POST"])
 def gconnect():
-    if request.args.get('state') != session["state"]:
+    if request.args.get('state') != session[SessionKeys.STATE]:
         return create_err_response(
-            "Invalid state parameter ([{}] vs. [{}])".format(request.args.get('state'), session['state']),
+            "Invalid state parameter ([{}] vs. [{}])".format(
+                request.args.get('state'), session[SessionKeys.STATE]),
             401)
     code = request.data
     try:
