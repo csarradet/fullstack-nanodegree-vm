@@ -98,8 +98,13 @@ def get_user(user_id):
 
 
 def new_user(username, auth_source, auth_source_id):
+    """ Creates a new database record and returns its ID number. """
+    id = None
     with get_cursor() as cursor:
         cursor.execute('INSERT INTO users VALUES (null, ?, ?, ?)', (
             username, auth_source, auth_source_id,))
-
+        cursor.execute('SELECT last_insert_rowid()')
+        id = cursor.fetchone()[0]
+    print "Created user with ID {}".format(id)
+    return id
 
