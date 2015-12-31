@@ -43,6 +43,11 @@ def load_from_session(key):
     return json.loads(session[key])
 
 
+@app.route('/static/<path:filename>')
+def download_static_file(filename):
+    return send_from_directory("/static", filename, as_attachment=True)
+
+
 @app.route('/')
 @app.route('/hello')
 def HelloWorld():
