@@ -31,10 +31,12 @@ from dal import AuthSource
 class SessionKeys(object):
     """ Enum listing all values used as keys within a Flask session """
     CURRENT_USER = "current_user"
+    CREDENTIALS = "credentials"
+    GPLUS_ID = "gplus_id"
 
-def save_to_session(key, object):
+def save_to_session(key, obj):
     """ Converts the object to a serializable format and stores it in a Flask session. """
-    session[key] = object.to_json()
+    session[key] = obj.to_json()
 
 def load_from_session(key):
     """ Loads serialized data from a Flask session and converts it back into an object. """
@@ -98,14 +100,14 @@ def gconnect():
         return create_err_response("Token's user ID doesn't match given user ID", 401)
 
     # Check to see if user is already logged in
-    stored_credentials = session.get("credentials")
-    stored_gplus_id = session.get("gplus_id")
+    stored_credentials = session.get(SessionKeys.CREDENTIALS)
+    stored_gplus_id = session.get(SessionKeys.GPLUS_ID)
     if stored_credentials is not None and gplus_id == stored_gplus_id:
         return create_err_response("Current user is already connected", 200)
 
     # Store the access token in the session for later use.
-    session["credentials"] = credentials.to_json()
-    session["gplus_id"] = gplus_id
+    save_to_session(SessionKeys.CREDENTIALS, credentials)
+    session[SessionKeys.GPLUS_ID] = gplus_id
 
     # Get user info
     try:
