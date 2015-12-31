@@ -128,7 +128,7 @@ def gconnect():
         return create_err_response(
             "Received invalid user data\n\nanswer.text: {}\n\ndata: {}".format(
                 answer.text, data), 401)
-    return "ok"
+    return "Authentication successful"
 
 
 def create_err_response(message, err_code):
@@ -140,7 +140,7 @@ def create_err_response(message, err_code):
 
 def render(filename, **kwargs):
     """
-    Decorator for flask's render_template().
+    Decorator for flask's render_template() function.
     Passes along any provided kwargs after adding in a few fields
     required by our base template, like info on the logged in user.
     """
