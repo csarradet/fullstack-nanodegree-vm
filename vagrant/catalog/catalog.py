@@ -25,6 +25,20 @@ CLIENT_ID = json.loads(
 
 from models import User
 import dal
+from dal import AuthSource
+
+
+class SessionKeys(object):
+    """ Enum listing all values used as keys within a Flask session """
+    CURRENT_USER = "current_user"
+
+def save_to_session(key, object):
+    """ Converts the object to a serializable format and stores it in a Flask session. """
+    session[key] = object.to_json()
+
+def load_from_session(key):
+    """ Loads serialized data from a Flask session and converts it back into an object. """
+    return json.loads(session[key])
 
 
 @app.route('/')
@@ -38,10 +52,12 @@ def UserList():
     user_list = dal.get_users()
     return render("user_list.html", users=user_list)
 
+
 @app.route('/users/<int:user_id>/')
 def UserLookup(user_id):
     user = [dal.get_user(user_id)]
     return render("user_list.html", users=user)
+
 
 @app.route('/login')
 def showLogin():
@@ -49,6 +65,7 @@ def showLogin():
         string.digits) for x in xrange(32))
     session["state"] = state
     return render("login.html", STATE=state)
+
 
 @app.route('/gconnect', methods=["POST"])
 def gconnect():
@@ -99,25 +116,17 @@ def gconnect():
         params = {"access_token": credentials.access_token, "alt":"json"}
         answer = requests.get(userinfo_url, params=params)
         data = json.loads(answer.text)
-        session["username"] = data["name"]
-        session["picture"] = data["picture"]
-        session["email"] = data["email"]
+
+        username = data["email"]
+        auth_source = AuthSource.GOOGLE_PLUS
+        auth_source_id = data["id"]
+        user = dal.get_or_create_user(username, auth_source, auth_source_id)
+        save_to_session(SessionKeys.CURRENT_USER, user)
     except Exception:
         return create_err_response(
             "Received invalid user data\n\nanswer.text: {}\n\ndata: {}".format(
                 answer.text, data), 401)
-    output = (
-        "<h1>Welcome, " +
-        session["username"] +
-        " (" +
-        session["email"] +
-        ")!</h1>" +
-        "<img src='" +
-        session["picture"] +
-        "' style = 'width: 300px; height: 300px; border-radius: 150px; -webkit-border-radius: 150px; -moz-border-radius: 150px;'> "
-        )
-    flash("you are now logged in as %s" % session["username"])
-    return output
+    return "ok"
 
 
 def create_err_response(message, err_code):
@@ -131,12 +140,16 @@ def render(filename, **kwargs):
     """
     Decorator for flask's render_template().
     Passes along any provided kwargs after adding in a few fields
-    required by our base template, like user info.
+    required by our base template, like info on the logged in user.
     """
-    dummy = User()
-    dummy.username = "foo"
-    kwargs["current_user"] = dummy
+    try:
+        kwargs["current_user"] = load_from_session(SessionKeys.CURRENT_USER)
+    except KeyError:
+        # Not logged in
+        kwargs["current_user"] = None
     return render_template(filename, **kwargs)
+
+
 
 
 if __name__ == '__main__':

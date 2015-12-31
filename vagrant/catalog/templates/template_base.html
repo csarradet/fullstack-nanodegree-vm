@@ -4,7 +4,12 @@
     {% block head %}{% endblock %}
 </head>
 <body>
+    {% if current_user is none %}
+    <h1>Not logged in</h1>
+    {% else %}
     <h1>Logged in as {{ current_user.username }}</h1>
+    {% endif %}
+
     {% block content %}
     {% endblock %}
 </body>

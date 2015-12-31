@@ -9,11 +9,11 @@ from models import User
 # Parameterized call syntax:
 # c.execute("DELETE FROM matches WHERE tourney_id = %s", (tourney_id,))
 
-class AuthSource:
+class AuthSource(object):
     """ Enum listing all authentication sources we currently support. """
-    dummy = "fake_auth_source"
-    google_plus = "google_plus"
-    facebook = "facebook"
+    DUMMY = "fake_auth_source"
+    GOOGLE_PLUS = "google_plus"
+    FACEBOOK = "facebook"
 
 
 @contextlib.contextmanager
@@ -60,8 +60,8 @@ def setup_db():
 
 
 def load_dummy_data():
-    new_user("dummy1@user.com", AuthSource.dummy, 1001)
-    new_user("dummy2@user.com", AuthSource.dummy, 2002)
+    get_or_create_user("dummy1@user.com", AuthSource.DUMMY, 1001)
+    get_or_create_user("dummy2@user.com", AuthSource.DUMMY, 2002)
 
 
 def model_from_row(model_class, row):
@@ -72,11 +72,20 @@ def model_from_row(model_class, row):
 
     Note that this will only work for very simple models; anything
     more complex should have its own converter.
+
+    Throws a TypeError if model_class isn't a class with a no-args constructor.
+
+    Returns a model_class instance if the row was valid, or None if it wasn't.
     """
-    model = model_class()
-    for field in row.keys():
-        setattr(model, field, row[field])
-    return model
+    if not row:
+        return None
+    try:
+        model = model_class()
+        for field in row.keys():
+            setattr(model, field, row[field])
+        return model
+    except KeyError:
+        return None
 
 
 def get_users():
@@ -97,7 +106,28 @@ def get_user(user_id):
     return output
 
 
-def new_user(username, auth_source, auth_source_id):
+def get_or_create_user(username, auth_source, auth_source_id):
+    """
+    Returns a User instance containing the referenced user's data if it exists
+    in the DB, or creates and returns it if it doesn't.
+
+    Assumes that auth_source_id is unique, consistent, and deterministic
+    within the domain of a particular auth_source.
+    """
+    output = None
+    with get_cursor() as cursor:
+        cursor.execute('SELECT * FROM users WHERE auth_source = ? AND auth_source_id = ?',
+            (auth_source, auth_source_id,))
+        output = model_from_row(User, cursor.fetchone())
+
+    if output:
+        return output
+    else:
+        user_id = create_user(username, auth_source, auth_source_id)
+        return get_user(user_id)
+
+
+def create_user(username, auth_source, auth_source_id):
     """ Creates a new database record and returns its ID number. """
     id = None
     with get_cursor() as cursor:
