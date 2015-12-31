@@ -2,7 +2,20 @@
 
 {% block content %}
     <h2>User list:</h2>
+    <table>
+    <tr>
+        <td>Local ID</td>
+        <td>Auth Source ID</td>
+        <td>Auth Source</td>
+        <td>Username</td>
+    </tr>
     {% for i in users %}
-    {{ i.user_id }}: {{ i.email }} // {{ i.auth_source}}<br>
+    <tr>
+        <td>{{ i.user_id }}</td>
+        <td>{{ i.auth_source_id }}</td>
+        <td>{{ i.auth_source }}</td>
+        <td>{{ i.username }}</td>
+    </tr>
     {% endfor %}
+    </table>
 {% endblock %}

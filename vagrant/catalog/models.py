@@ -1,8 +1,8 @@
 class User(object):
     user_id = None
-    email = None
+    username = None
     auth_source = None
-
+    auth_source_id = None
 
 class Category(object):
     cat_id = None

@@ -9,6 +9,13 @@ from models import User
 # Parameterized call syntax:
 # c.execute("DELETE FROM matches WHERE tourney_id = %s", (tourney_id,))
 
+class AuthSource:
+    """ Enum listing all authentication sources we currently support. """
+    dummy = "fake_auth_source"
+    google_plus = "google_plus"
+    facebook = "facebook"
+
+
 @contextlib.contextmanager
 def get_cursor():
     """
@@ -53,12 +60,8 @@ def setup_db():
 
 
 def load_dummy_data():
-    with get_cursor() as cursor:
-        auth = "fake_auth_source"
-        email = "dummy1@user.com"
-        cursor.execute('INSERT INTO users VALUES (null, ?, ?, ?)', (email, auth, email,))
-        email = "dummy2@user.com"
-        cursor.execute('INSERT INTO users VALUES (null, ?, ?, ?)', (email, auth, email,))
+    new_user("dummy1@user.com", AuthSource.dummy, 1001)
+    new_user("dummy2@user.com", AuthSource.dummy, 2002)
 
 
 def model_from_row(model_class, row):
@@ -93,5 +96,10 @@ def get_user(user_id):
         output = model_from_row(User, cursor.fetchone())
     return output
 
+
+def new_user(username, auth_source, auth_source_id):
+    with get_cursor() as cursor:
+        cursor.execute('INSERT INTO users VALUES (null, ?, ?, ?)', (
+            username, auth_source, auth_source_id,))
 
 
