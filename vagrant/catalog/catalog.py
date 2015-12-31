@@ -6,6 +6,11 @@ import logging
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 
+from oauth2client.client import flow_from_clientsecrets
+from oauth2client.client import FlowExchangeError
+import httplib2
+import json
+import requests
 from flask import (
     Flask,
     flash,
@@ -15,16 +20,12 @@ from flask import (
     session
     )
 app = Flask(__name__)
-from oauth2client.client import flow_from_clientsecrets
-from oauth2client.client import FlowExchangeError
-import httplib2
-import json
-import requests
-
 CLIENT_ID = json.loads(
     open("client_secrets.json", "r").read())["web"]["client_id"]
 
+from models import User
 import dal
+
 
 @app.route('/')
 @app.route('/hello')
@@ -35,19 +36,19 @@ def HelloWorld():
 @app.route('/users/list')
 def UserList():
     user_list = dal.get_users()
-    return render_template("user_list.html", users=user_list)
+    return render("user_list.html", users=user_list)
 
 @app.route('/users/<int:user_id>/')
 def UserLookup(user_id):
     user = [dal.get_user(user_id)]
-    return render_template("user_list.html", users=user)
+    return render("user_list.html", users=user)
 
 @app.route('/login')
 def showLogin():
     state = "".join(random.choice(string.ascii_uppercase +
         string.digits) for x in xrange(32))
     session["state"] = state
-    return render_template("login.html", STATE=state)
+    return render("login.html", STATE=state)
 
 @app.route('/gconnect', methods=["POST"])
 def gconnect():
@@ -108,7 +109,9 @@ def gconnect():
     output = (
         "<h1>Welcome, " +
         session["username"] +
-        "!</h1>" +
+        " (" +
+        session["email"] +
+        ")!</h1>" +
         "<img src='" +
         session["picture"] +
         "' style = 'width: 300px; height: 300px; border-radius: 150px; -webkit-border-radius: 150px; -moz-border-radius: 150px;'> "
@@ -122,6 +125,18 @@ def create_err_response(message, err_code):
     response.headers["Content-Type"] = "application/json"
     logger.error("{} error: {}".format(err_code, message))
     return response
+
+
+def render(filename, **kwargs):
+    """
+    Decorator for flask's render_template().
+    Passes along any provided kwargs after adding in a few fields
+    required by our base template, like user info.
+    """
+    dummy = User()
+    dummy.username = "foo"
+    kwargs["current_user"] = dummy
+    return render_template(filename, **kwargs)
 
 
 if __name__ == '__main__':
