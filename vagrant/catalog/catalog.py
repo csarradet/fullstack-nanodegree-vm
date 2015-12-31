@@ -15,6 +15,7 @@ from flask import (
     Flask,
     flash,
     make_response,
+    redirect,
     render_template,
     request,
     session
@@ -50,20 +51,26 @@ def download_static_file(filename):
 
 @app.route('/')
 @app.route('/hello')
-def HelloWorld():
+def helloWorld():
     return "Hello world"
 
 
 @app.route('/users/list')
-def UserList():
+def userList():
     user_list = dal.get_users()
     return render("user_list.html", users=user_list)
 
 
 @app.route('/users/<int:user_id>/')
-def UserLookup(user_id):
+def userLookup(user_id):
     user = [dal.get_user(user_id)]
     return render("user_list.html", users=user)
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect("/")
 
 
 @app.route('/login')
