@@ -6,8 +6,6 @@ logger = logging.getLogger(__name__)
 
 from models import User
 
-# Parameterized call syntax:
-# c.execute("DELETE FROM matches WHERE tourney_id = %s", (tourney_id,))
 
 class AuthSource(object):
     """ Enum listing all authentication sources we currently support. """
@@ -19,7 +17,7 @@ class AuthSource(object):
 @contextlib.contextmanager
 def get_cursor():
     """
-    (This function was taken from the code review for FSND project 2)
+    (This function was adapted from the code review for FSND project 2)
 
     Helper function that provides a DB cursor scoped to a with block.
 
@@ -60,8 +58,8 @@ def setup_db():
 
 
 def load_dummy_data():
-    get_or_create_user("dummy1@user.com", AuthSource.DUMMY, 1001)
-    get_or_create_user("dummy2@user.com", AuthSource.DUMMY, 2002)
+    user1 = get_or_create_user("dummy1@user.com", AuthSource.DUMMY, 1001)
+    user2 = get_or_create_user("dummy2@user.com", AuthSource.DUMMY, 2002)
 
 
 def model_from_row(model_class, row):
@@ -111,7 +109,7 @@ def get_or_create_user(username, auth_source, auth_source_id):
     Returns a User instance containing the referenced user's data if it exists
     in the DB, or creates and returns it if it doesn't.
 
-    Assumes that auth_source_id is unique, consistent, and deterministic
+    Assumes that auth_source_id is mandatory, unique, and consistent
     within the domain of a particular auth_source.
     """
     output = None
@@ -138,3 +136,8 @@ def create_user(username, auth_source, auth_source_id):
     print "Created user with ID {}".format(id)
     return id
 
+
+
+
+if __name__ == '__main__':
+    setup_db()

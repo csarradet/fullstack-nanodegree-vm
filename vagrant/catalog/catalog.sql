@@ -29,6 +29,7 @@ CREATE TABLE items (
     name TEXT NOT NULL,
     cat_id INTEGER NOT NULL,
     creator_id INTEGER NOT NULL,
+    created DATETIME NOT NULL,
     FOREIGN KEY(cat_id) REFERENCES categories(cat_id),
     FOREIGN KEY(creator_id) REFERENCES users(user_id)
     );

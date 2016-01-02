@@ -174,6 +174,4 @@ if __name__ == '__main__':
     app.debug = True
     app.secret_key = "abc123"
     app.config["SESSION_TYPE"] = "filesystem"
-
-    dal.setup_db()
     app.run(host = '0.0.0.0', port = 5000)
