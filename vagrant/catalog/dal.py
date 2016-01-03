@@ -1,8 +1,13 @@
 """
-This file houses our data abstraction layer.
+This file houses our data abstraction layer.  It insulates the rest
+of the application code from whichever database we happen to be
+using (sqlite3, in this case).
 
-It insulates the rest of the application code from whichever
-database we happen to be using (sqlite3, in this case).
+Note that while the __simple_xxx functions use unsafe string
+concatenation for table and column names, they're only intended
+to be used from within this module and are always called with static values.
+All data originating from the user (things like names and ID numbers)
+are properly passed to the DB using parameterized queries.
 
 ***
 The example classes for this project used SQLAlchemy's ORM solution --
@@ -36,7 +41,7 @@ def get_cursor():
     conn = sqlite3.connect("catalog.db")
     # This wrapper adds the ability to access a row's fields by column name,
     # allowing us to auto-convert them to entities as long as the field names
-    # match (see model_from_row()).
+    # match (see entity_from_row()).
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
     try:
@@ -48,60 +53,60 @@ def get_cursor():
     finally:
         conn.close()
 
-def model_from_row(model_class, row):
+def entity_from_row(entity_class, row):
     """
-    Converts a database row into a new instance of type model_class.
+    Converts a database row into a new instance of type entity_class.
     Assumes that every column in the row corresponds to a field in
-    model_class that has the same spelling and can be copied verbatim.
+    entity_class that has the same spelling and can be copied verbatim.
 
-    Note that this will only work for very simple models; anything
+    Note that this will only work for very simple entities; anything
     more complex should have its own converter.
 
-    Throws a TypeError if model_class isn't a class with a no-args constructor.
+    Throws a TypeError if entity_class isn't a class with a no-args constructor.
 
-    Returns a model_class instance if the row was valid, or None if it wasn't.
+    Returns an entity_class instance if the row was valid, or None if it wasn't.
     """
     if not row:
         return None
     try:
-        model = model_class()
+        entity = entity_class()
         for field in row.keys():
-            setattr(model, field, row[field])
-        return model
+            setattr(entity, field, row[field])
+        return entity
     except KeyError:
         return None
 
-def __simple_get_all(table_name, model_class):
+def __simple_get_all(table_name, entity_class):
     """
-    table_name and model_class will be processed through simple string formatting;
+    table_name and entity_class will be processed through simple string formatting;
     *do not* send user input to these fields.
-    Gets all models of type model_class from the given table.
+    Gets all entities of type entity_class from the given table.
     """
     output = []
     with get_cursor() as cursor:
         cursor.execute('SELECT * FROM {}'.format(table_name))
         result = cursor.fetchall()
     for row in result:
-        output.append(model_from_row(model_class, row))
+        output.append(entity_from_row(entity_class, row))
     return output
 
-def __simple_get(table_name, model_class, search_field, search_text):
+def __simple_get(table_name, entity_class, search_field, search_text):
     """
-    search_field, table_name and model_class will be processed through simple string formatting;
+    search_field, table_name and entity_class will be processed through simple string formatting;
     *do not* send user input to these fields.
-    Gets the first model of type model_class from table_name with the given ID.
+    Gets the first entity of type entity_class from table_name with the given ID.
     """
     output = None
     with get_cursor() as cursor:
         cursor.execute('SELECT * FROM {} WHERE {} = ? LIMIT 1'.format(table_name, search_field), (search_text,))
-        output = model_from_row(model_class, cursor.fetchone())
+        output = entity_from_row(entity_class, cursor.fetchone())
     return output
 
-def __simple_delete(table_name, model_class, search_field, search_text):
+def __simple_delete(table_name, entity_class, search_field, search_text):
     """
-    search_field, table_name and model_class will be processed through simple string formatting;
+    search_field, table_name and entity_class will be processed through simple string formatting;
     *do not* send user input to these fields.
-    Deletes all models of type model_class from table_name with the given ID.
+    Deletes all entities of type entity_class from table_name with the given ID.
     """
     with get_cursor() as cursor:
         cursor.execute('DELETE FROM {} WHERE {} = ?'.format(table_name, search_field), (search_text,))
@@ -126,7 +131,7 @@ def get_or_create_user(username, auth_source, auth_source_id):
     with get_cursor() as cursor:
         cursor.execute('SELECT * FROM users WHERE auth_source = ? AND auth_source_id = ?',
             (auth_source, auth_source_id,))
-        output = model_from_row(User, cursor.fetchone())
+        output = entity_from_row(User, cursor.fetchone())
 
     if output:
         return output
@@ -182,7 +187,7 @@ def get_items_by_cat(cat_id):
         cursor.execute('SELECT * FROM items WHERE cat_id = ?', (cat_id,))
         result = cursor.fetchall()
     for row in result:
-        output.append(model_from_row(Item, row))
+        output.append(entity_from_row(Item, row))
     return output
 
 def get_item_by_name(cat_id, item_name):
@@ -190,7 +195,7 @@ def get_item_by_name(cat_id, item_name):
     with get_cursor() as cursor:
         cursor.execute('SELECT * FROM items WHERE cat_id = ? AND name = ?',
             (cat_id, item_name,))
-        output = model_from_row(Item, cursor.fetchone())
+        output = entity_from_row(Item, cursor.fetchone())
     return output
 
 def create_item(name, category_id, creator_id):
