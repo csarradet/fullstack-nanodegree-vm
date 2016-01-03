@@ -23,6 +23,9 @@ def not_authorized_error():
 def not_found_error():
     return create_err_response("The requested resource was not found", 404)
 
+def already_exists_error():
+    return create_err_response("Unable to create -- that resource already exists", 400)
+
 def render(filename, **kwargs):
     """
     Decorator for flask's render_template() function.

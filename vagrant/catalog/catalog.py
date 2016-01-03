@@ -25,11 +25,12 @@ CLIENT_ID = json.loads(
 import dal
 from dal import AuthSource
 from handler_utils import (
+    render,
     create_err_response,
+    already_exists_error,
     not_authenticated_error,
     not_authorized_error,
-    not_found_error,
-    render
+    not_found_error
     )
 from models import User
 from session_utils import (
@@ -47,7 +48,6 @@ def download_static_file(filename):
     return send_from_directory("/static", filename, as_attachment=True)
 
 @app.route('/')
-@app.route('/hello')
 def helloWorld():
     """ Serves the splash page for the application. """
     return "Hello world"
@@ -58,9 +58,11 @@ def userList():
     user_list = dal.get_users()
     return render("user_list.html", users=user_list)
 
-@app.route('/users/<int:user_id>/')
+@app.route('/users/by_id/<int:user_id>/')
 def userLookup(user_id):
     user = [dal.get_user(user_id)]
+    if not user:
+        return not_found_error()
     return render("user_list.html", users=user)
 
 
@@ -69,9 +71,18 @@ def categoryList():
     cat_list = dal.get_categories()
     return render("cat_list.html", categories=cat_list)
 
-@app.route('/categories/<int:cat_id>/')
+@app.route('/categories/by_id/<int:cat_id>/')
 def categoryLookup(cat_id):
     cat = [dal.get_category(cat_id)]
+    if not cat:
+        return not_found_error()
+    return render("cat_list.html", categories=cat)
+
+@app.route('/categories/by_name/<cat_name>/')
+def categoryNameLookup(cat_name):
+    cat = [dal.get_category_by_name(cat_name)]
+    if not cat:
+        return not_found_error()
     return render("cat_list.html", categories=cat)
 
 @app.route('/categories/create/<name>/')
@@ -79,6 +90,9 @@ def categoryCreate(name):
     active_user = get_active_user()
     if not active_user:
         return not_authenticated_error()
+    duplicate = dal.get_category_by_name(name)
+    if duplicate:
+        return already_exists_error()
     cat_id = dal.create_category(name, active_user.user_id)
     return categoryList()
 
@@ -94,6 +108,57 @@ def categoryDelete(name):
         return not_authorized_error()
     dal.delete_category(cat.cat_id)
     return categoryList()
+
+
+@app.route('/items/list')
+def itemList():
+    item_list = dal.get_items()
+    return render("item_list.html", items=item_list)
+
+@app.route('/items/by_id/<int:item_id>/')
+def itemLookup(item_id):
+    item = [dal.get_item(item_id)]
+    if not item:
+        return not_found_error()
+    return render("item_list.html", items=item)
+
+@app.route('/categories/by_name/<cat_name>/items/list')
+def itemListByCategory(cat_name):
+    cat = dal.get_category_by_name(cat_name)
+    if not cat:
+        return not_found_error()
+    item_list = dal.get_items_by_cat(cat.cat_id)
+    return render("item_list.html", items=item_list)
+
+@app.route('/categories/by_name/<cat_name>/items/create/<item_name>/')
+def itemCreate(cat_name, item_name):
+    cat = dal.get_category_by_name(cat_name)
+    if not cat:
+        return not_found_error()
+    active_user = get_active_user()
+    if not active_user:
+        return not_authenticated_error()
+    duplicate = dal.get_item_by_name(cat.cat_id, item_name)
+    if duplicate:
+        return already_exists_error()
+    item = dal.create_item(item_name, cat.cat_id, active_user.user_id)
+    return itemListByCategory(cat_name)
+
+@app.route('/categories/by_name/<cat_name>/items/delete/<item_name>/')
+def itemDelete(cat_name, item_name):
+    cat = dal.get_category_by_name(cat_name)
+    if not cat:
+        return not_found_error()
+    active_user = get_active_user()
+    if not active_user:
+        return not_authenticated_error()
+    item = dal.get_item_by_name(cat.cat_id, item_name)
+    if not item:
+        return not_found_error()
+    if active_user.user_id != item.creator_id:
+        return not_authorized_error()
+    dal.delete_item(item.item_id)
+    return itemListByCategory(cat_name)
 
 
 
@@ -153,7 +218,7 @@ def gconnect():
     save_to_session(SessionKeys.CREDENTIALS, credentials)
     session[SessionKeys.GPLUS_ID] = gplus_id
 
-    # Get user info
+    # Get user info from Google
     try:
         answer = None
         data = None
@@ -166,6 +231,8 @@ def gconnect():
         username = data["email"]
         auth_source = AuthSource.GOOGLE_PLUS
         auth_source_id = data["id"]
+        # Everything checks out.  Create a new user record if this is the
+        # first time they've logged in, then set them as active in the session.
         user = dal.get_or_create_user(username, auth_source, auth_source_id)
         set_active_user(user)
     except Exception:

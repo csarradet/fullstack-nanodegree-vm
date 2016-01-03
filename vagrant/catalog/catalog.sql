@@ -2,9 +2,9 @@
 PRAGMA foreign_keys=ON;
 
 -- Wipe any existing data --
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS items;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS users;
 
 
 -- Create tables --

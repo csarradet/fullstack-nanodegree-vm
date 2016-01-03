@@ -1,0 +1,21 @@
+{% extends "template_base.html" %}
+
+{% block content %}
+    <h2>Item list:</h2>
+    <table>
+    <tr>
+        <td>Local ID</td>
+        <td>Name</td>
+        <td>Category ID</td>
+        <td>Creator ID</td>
+    </tr>
+    {% for i in items %}
+    <tr>
+        <td>{{ i.item_id }}</td>
+        <td>{{ i.name }}</td>
+        <td>{{ i.cat_id }}</td>
+        <td>{{ i.creator_id }}</td>
+    </tr>
+    {% endfor %}
+    </table>
+{% endblock %}

@@ -14,6 +14,7 @@ class AuthSource(object):
     FACEBOOK = "facebook"
 
 
+
 @contextlib.contextmanager
 def get_cursor():
     """
@@ -40,7 +41,6 @@ def get_cursor():
     finally:
         conn.close()
 
-
 def model_from_row(model_class, row):
     """
     Converts a database row into a new instance of type model_class.
@@ -64,14 +64,12 @@ def model_from_row(model_class, row):
     except KeyError:
         return None
 
-
 def __simple_get_all(table_name, model_class):
     """
     table_name and model_class will be processed through simple string formatting;
     *do not* send user input to these fields.
     Gets all models of type model_class from the given table.
     """
-
     output = []
     with get_cursor() as cursor:
         cursor.execute('SELECT * FROM {}'.format(table_name))
@@ -84,11 +82,11 @@ def __simple_get(table_name, model_class, search_field, search_text):
     """
     search_field, table_name and model_class will be processed through simple string formatting;
     *do not* send user input to these fields.
-    Gets a model of type model_class from table_name with the given ID.
+    Gets the first model of type model_class from table_name with the given ID.
     """
     output = None
     with get_cursor() as cursor:
-        cursor.execute('SELECT * FROM {} WHERE {} = ?'.format(table_name, search_field), (search_text,))
+        cursor.execute('SELECT * FROM {} WHERE {} = ? LIMIT 1'.format(table_name, search_field), (search_text,))
         output = model_from_row(model_class, cursor.fetchone())
     return output
 
@@ -100,6 +98,7 @@ def __simple_delete(table_name, model_class, search_field, search_text):
     """
     with get_cursor() as cursor:
         cursor.execute('DELETE FROM {} WHERE {} = ?'.format(table_name, search_field), (search_text,))
+
 
 
 def get_users():
@@ -139,6 +138,7 @@ def create_user(username, auth_source, auth_source_id):
     return id
 
 
+
 def get_categories():
     return __simple_get_all("categories", Category)
 
@@ -162,25 +162,73 @@ def delete_category(cat_id):
     __simple_delete("categories", Category, "cat_id", cat_id)
 
 
+
+def get_items():
+    return __simple_get_all("items", Item)
+
+def get_item(item_id):
+    return __simple_get("items", Item, "item_id", item_id)
+
+def get_items_by_cat(cat_id):
+    output = []
+    with get_cursor() as cursor:
+        cursor.execute('SELECT * FROM items WHERE cat_id = ?', (cat_id,))
+        result = cursor.fetchall()
+    for row in result:
+        output.append(model_from_row(Item, row))
+    return output
+
+def get_item_by_name(cat_id, item_name):
+    output = None
+    with get_cursor() as cursor:
+        cursor.execute('SELECT * FROM items WHERE cat_id = ? AND name = ?',
+            (cat_id, item_name,))
+        output = model_from_row(Item, cursor.fetchone())
+    return output
+
+def create_item(name, category_id, creator_id):
+    id = None
+    with get_cursor() as cursor:
+        cursor.execute('INSERT INTO items VALUES (null, ?, ?, ?, ?)', (
+            name, category_id, creator_id, "now"))
+        cursor.execute('SELECT last_insert_rowid()')
+        id = cursor.fetchone()[0]
+    return id
+
+def delete_item(item_id):
+    __simple_delete("items", Item, "item_id", item_id)
+
+
+
 def setup_db():
     """
     Executes our database setup script (this will wipe any existing data).
     Uses a code snippet from http://stackoverflow.com/questions/2380553/sqlite-run-multi-line-sql-script-from-file
     """
-    print("Setting up DB")
     print(" - Clearing existing data")
     print(" - Creating tables and views")
     qry = open("catalog.sql", "r").read()
     with get_cursor() as cursor:
         cursor.executescript(qry)
-    print(" - Creating dummy records")
-    load_dummy_data()
-    print("DB setup complete")
+    print(" - DB setup complete")
 
 def load_dummy_data():
-    user1 = get_or_create_user("dummy1@user.com", AuthSource.DUMMY, 1001)
-    user2 = get_or_create_user("dummy2@user.com", AuthSource.DUMMY, 2002)
+    """
+    Creates a few dummy values to help with debugging.
+    """
+    user1 = get_or_create_user("dummy1@user.com", AuthSource.DUMMY, 1001).user_id
+    user2 = get_or_create_user("dummy2@user.com", AuthSource.DUMMY, 2002).user_id
+    cat1 = create_category("Food", user1)
+    cat2 = create_category("Explosives", user2)
+    item1_1 = create_item("Gagh", cat1, user1)
+    item1_2 = create_item("Roasted Tauntaun", cat1, user2)
+    item2_1 = create_item("Red-Matter", cat2, user1)
+    item2_2 = create_item("Thermal-Detonator", cat2, user2)
+
+
 
 if __name__ == '__main__':
+    print("Setting up DB")
     setup_db()
+    print("Creating dummy records")
     load_dummy_data()
