@@ -32,7 +32,7 @@ CLIENT_ID = json.loads(
     open("client_secrets.json", "r").read())["web"]["client_id"]
 
 import dal
-from dal import AuthSource
+from entities import AuthSource
 from handler_utils import (
     render,
     create_err_response,
