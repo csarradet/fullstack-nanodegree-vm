@@ -52,7 +52,10 @@ from session_utils import (
 
 @app.route('/static/<path:filename>')
 def download_static_file(filename):
-    """ Serves static files, like .css or .js resources. """
+    """
+    Safely serves static files, like .css or .js resources.
+    Using send_from_directory will prevent directory traversal attacks.
+    """
     return send_from_directory("/static", filename, as_attachment=True)
 
 @app.route('/')
