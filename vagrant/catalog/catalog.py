@@ -24,37 +24,20 @@ app = Flask(__name__)
 CLIENT_ID = json.loads(
     open("client_secrets.json", "r").read())["web"]["client_id"]
 
-from models import User
 import dal
 from dal import AuthSource
-
-
-class SessionKeys(object):
-    """ Enum listing all values used as keys within a Flask session """
-    CURRENT_USER = "current_user"
-    CREDENTIALS = "credentials"
-    GPLUS_ID = "gplus_id"
-    STATE = "state"
-
-def save_to_session(key, obj):
-    """ Converts the object to a serializable format and stores it in a Flask session. """
-    session[key] = obj.to_json()
-
-def load_from_session(key):
-    """ Loads serialized data from a Flask session and converts it back into an object. """
-    return json.loads(session[key])
-
-
-
+from models import User
+from session_utils import SessionKeys, save_to_session, load_from_session
 
 @app.route('/static/<path:filename>')
 def download_static_file(filename):
+    """ Serves static files, like .css or .js resources. """
     return send_from_directory("/static", filename, as_attachment=True)
-
 
 @app.route('/')
 @app.route('/hello')
 def helloWorld():
+    """ Serves the splash page for the application. """
     return "Hello world"
 
 
@@ -70,22 +53,24 @@ def userLookup(user_id):
     return render("user_list.html", users=user)
 
 
+
 @app.route('/logout')
 def logout():
+    """ Terminates all session data for the user, including login credentials. """
     session.clear()
     return redirect("/")
 
-
 @app.route('/login')
 def showLogin():
+    """ Creates a nonce and displays the page displaying available login options. """
     state = "".join(random.choice(string.ascii_uppercase +
         string.digits) for x in xrange(32))
     session[SessionKeys.STATE] = state
     return render("login.html", STATE=state)
 
-
 @app.route('/gconnect', methods=["POST"])
 def gconnect():
+    """ Receives and processes Google Plus login requests. """
     if request.args.get('state') != session[SessionKeys.STATE]:
         return create_err_response(
             "Invalid state parameter ([{}] vs. [{}])".format(
@@ -146,13 +131,12 @@ def gconnect():
                 answer.text, data), 401)
     return "Authentication successful"
 
-
 def create_err_response(message, err_code):
+    """ Helper function to simplify the error cases above. """
     response = make_response(json.dumps(message), err_code)
     response.headers["Content-Type"] = "application/json"
     logger.error("{} error: {}".format(err_code, message))
     return response
-
 
 def render(filename, **kwargs):
     """
@@ -174,4 +158,5 @@ if __name__ == '__main__':
     app.debug = True
     app.secret_key = "abc123"
     app.config["SESSION_TYPE"] = "filesystem"
+    print "Starting catalogifier web service; press ctrl-c to exit."
     app.run(host = '0.0.0.0', port = 5000)
