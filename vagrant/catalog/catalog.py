@@ -1,3 +1,12 @@
+"""
+This file houses the bulk of our business logic layer.
+
+It defines all routes used by our web application, and
+defines the methods that receive user input, perform safety checks,
+and interact with the DAL to perform CRUD operations.
+"""
+
+
 import random
 import pprint
 import string
@@ -32,7 +41,6 @@ from handler_utils import (
     not_authorized_error,
     not_found_error
     )
-from models import User
 from session_utils import (
     SessionKeys,
     save_to_session,
@@ -64,6 +72,7 @@ def userLookup(user_id):
     if not user:
         return not_found_error()
     return render("user_list.html", users=user)
+
 
 
 @app.route('/categories/list')
@@ -108,6 +117,7 @@ def categoryDelete(name):
         return not_authorized_error()
     dal.delete_category(cat.cat_id)
     return categoryList()
+
 
 
 @app.route('/items/list')
@@ -178,7 +188,10 @@ def showLogin():
 
 @app.route('/gconnect', methods=["POST"])
 def gconnect():
-    """ Receives and processes Google Plus login requests. """
+    """
+    Receives and processes Google Plus login requests.
+    Most of this code was adapted from the intro course on authentication.
+    """
     if request.args.get('state') != session[SessionKeys.STATE]:
         return create_err_response(
             "Invalid state parameter ([{}] vs. [{}])".format(

@@ -1,3 +1,9 @@
+"""
+This file contains helper functions to make our web handler code
+cleaner.
+"""
+
+
 from flask import make_response, render_template
 import json
 from session_utils import get_active_user
@@ -8,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def create_err_response(message, err_code):
-    """ Ignores any remaining web handler code and throws the provided error. """
+    """ Ignores any remaining web handler code and logs + throws the provided error. """
     response = make_response(json.dumps(message), err_code)
     response.headers["Content-Type"] = "application/json"
     logger.error("{} error: {}".format(err_code, message))

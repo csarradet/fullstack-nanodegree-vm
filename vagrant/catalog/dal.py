@@ -3,6 +3,14 @@ This file houses our data abstraction layer.
 
 It insulates the rest of the application code from whichever
 database we happen to be using (sqlite3, in this case).
+
+***
+The example classes for this project used SQLAlchemy's ORM solution --
+not to start a flame war, but I have some philosophical issues with
+ORM as a whole.
+Given the choice, I'd much rather have the database code under my
+control in its own module.
+***
 """
 
 import contextlib
@@ -11,7 +19,7 @@ import sqlite3
 import logging
 logger = logging.getLogger(__name__)
 
-from models import AuthSource, User, Category, Item
+from entities import AuthSource, User, Category, Item
 
 
 @contextlib.contextmanager

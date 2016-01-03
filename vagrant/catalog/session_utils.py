@@ -1,7 +1,12 @@
+"""
+This file contains utilities to simplify interaction with Flask sessions,
+like checking the active user or serializing entities into the session.
+"""
+
 from flask import session
 import json
 
-from models import User
+from entities import User
 
 
 class SessionKeys(object):
