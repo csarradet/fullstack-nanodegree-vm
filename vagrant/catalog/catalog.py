@@ -14,9 +14,7 @@ import requests
 from flask import (
     Flask,
     flash,
-    make_response,
     redirect,
-    render_template,
     request,
     session
     )
@@ -26,8 +24,22 @@ CLIENT_ID = json.loads(
 
 import dal
 from dal import AuthSource
+from handler_utils import (
+    create_err_response,
+    not_authenticated_error,
+    not_authorized_error,
+    not_found_error,
+    render
+    )
 from models import User
-from session_utils import SessionKeys, save_to_session, load_from_session
+from session_utils import (
+    SessionKeys,
+    save_to_session,
+    load_from_session,
+    set_active_user,
+    get_active_user
+    )
+
 
 @app.route('/static/<path:filename>')
 def download_static_file(filename):
@@ -46,11 +58,42 @@ def userList():
     user_list = dal.get_users()
     return render("user_list.html", users=user_list)
 
-
 @app.route('/users/<int:user_id>/')
 def userLookup(user_id):
     user = [dal.get_user(user_id)]
     return render("user_list.html", users=user)
+
+
+@app.route('/categories/list')
+def categoryList():
+    cat_list = dal.get_categories()
+    return render("cat_list.html", categories=cat_list)
+
+@app.route('/categories/<int:cat_id>/')
+def categoryLookup(cat_id):
+    cat = [dal.get_category(cat_id)]
+    return render("cat_list.html", categories=cat)
+
+@app.route('/categories/create/<name>/')
+def categoryCreate(name):
+    active_user = get_active_user()
+    if not active_user:
+        return not_authenticated_error()
+    cat_id = dal.create_category(name, active_user.user_id)
+    return categoryList()
+
+@app.route('/categories/delete/<name>/')
+def categoryDelete(name):
+    cat = dal.get_category_by_name(name)
+    if not cat:
+        return not_found_error()
+    active_user = get_active_user()
+    if not active_user:
+        return not_authenticated_error()
+    if active_user.user_id != cat.creator_id:
+        return not_authorized_error()
+    dal.delete_category(cat.cat_id)
+    return categoryList()
 
 
 
@@ -62,7 +105,7 @@ def logout():
 
 @app.route('/login')
 def showLogin():
-    """ Creates a nonce and displays the page displaying available login options. """
+    """ Creates a nonce and displays the page listing available login options. """
     state = "".join(random.choice(string.ascii_uppercase +
         string.digits) for x in xrange(32))
     session[SessionKeys.STATE] = state
@@ -124,32 +167,13 @@ def gconnect():
         auth_source = AuthSource.GOOGLE_PLUS
         auth_source_id = data["id"]
         user = dal.get_or_create_user(username, auth_source, auth_source_id)
-        save_to_session(SessionKeys.CURRENT_USER, user)
+        set_active_user(user)
     except Exception:
         return create_err_response(
             "Received invalid user data\n\nanswer.text: {}\n\ndata: {}".format(
                 answer.text, data), 401)
     return "Authentication successful"
 
-def create_err_response(message, err_code):
-    """ Helper function to simplify the error cases above. """
-    response = make_response(json.dumps(message), err_code)
-    response.headers["Content-Type"] = "application/json"
-    logger.error("{} error: {}".format(err_code, message))
-    return response
-
-def render(filename, **kwargs):
-    """
-    Decorator for flask's render_template() function.
-    Passes along any provided kwargs after adding in a few fields
-    required by our base template, like info on the logged in user.
-    """
-    try:
-        kwargs["current_user"] = load_from_session(SessionKeys.CURRENT_USER)
-    except KeyError:
-        # Not logged in
-        kwargs["current_user"] = None
-    return render_template(filename, **kwargs)
 
 
 

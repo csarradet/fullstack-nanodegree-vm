@@ -1,6 +1,8 @@
 from flask import session
 import json
 
+from models import User
+
 
 class SessionKeys(object):
     """ Enum listing all values used as keys within a Flask session """
@@ -16,3 +18,22 @@ def save_to_session(key, obj):
 def load_from_session(key):
     """ Loads serialized data from a Flask session and converts it back into an object. """
     return json.loads(session[key])
+
+
+def set_active_user(user):
+    """
+    Sets the given user as the active user for this session.
+    """
+    save_to_session(SessionKeys.CURRENT_USER, user)
+
+def get_active_user():
+    """
+    Inspects the session data to look up the currently logged in user.
+    Returns None if no one is logged in.
+    """
+    try:
+        user_dict = load_from_session(SessionKeys.CURRENT_USER)
+        user = User(**user_dict)
+        return user
+    except KeyError:
+        return None
