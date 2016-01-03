@@ -1,12 +1,22 @@
 import json
 
+
+class AuthSource(object):
+    """ Enum listing all authentication sources we currently support. """
+    DUMMY = "fake_auth_source"
+    GOOGLE_PLUS = "google_plus"
+    FACEBOOK = "facebook"
+
+
 class Model(object):
+
     def __init__(self):
         pass
 
     def __init__(self, **entries):
         """
-        Reconstructs a Model instance from a dict.  Uses code from:
+        Reconstructs a Model instance from a dict.  Useful when deserializing.
+        Uses code from:
         http://stackoverflow.com/questions/1305532/convert-python-dict-to-object
         """
         self.__dict__.update(entries)

@@ -1,18 +1,17 @@
+"""
+This file houses our data abstraction layer.
+
+It insulates the rest of the application code from whichever
+database we happen to be using (sqlite3, in this case).
+"""
+
 import contextlib
 import sqlite3
 
 import logging
 logger = logging.getLogger(__name__)
 
-from models import User, Category, Item
-
-
-class AuthSource(object):
-    """ Enum listing all authentication sources we currently support. """
-    DUMMY = "fake_auth_source"
-    GOOGLE_PLUS = "google_plus"
-    FACEBOOK = "facebook"
-
+from models import AuthSource, User, Category, Item
 
 
 @contextlib.contextmanager
@@ -222,8 +221,8 @@ def load_dummy_data():
     cat2 = create_category("Explosives", user2)
     item1_1 = create_item("Gagh", cat1, user1)
     item1_2 = create_item("Roasted Tauntaun", cat1, user2)
-    item2_1 = create_item("Red-Matter", cat2, user1)
-    item2_2 = create_item("Thermal-Detonator", cat2, user2)
+    item2_1 = create_item("Red Matter", cat2, user1)
+    item2_2 = create_item("Thermal Detonator", cat2, user2)
 
 
 
