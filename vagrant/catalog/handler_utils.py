@@ -13,12 +13,28 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 
 
+def jdefault(o):
+    """
+    Default JSON encoder for using complex objects with json.dumps.
+    Uses code from http://pythontips.com/2013/08/08/storing-and-loading-data-with-json/
+    """
+    return o.__dict__
+
+def create_json_response(obj, http_status_code=200):
+    """
+    Dumps the provided object into a JSON response and returns a success code.
+    Assumes that obj is already in JSON format.
+    """
+    response = make_response(obj, http_status_code)
+    response.headers["Content-Type"] = "application/json"
+    return response
+
 def create_err_response(message, err_code):
     """ Ignores any remaining web handler code and logs + throws the provided error. """
-    response = make_response(json.dumps(message), err_code)
-    response.headers["Content-Type"] = "application/json"
+    response = create_json_response(json.dumps(message), http_status_code=err_code)
     logger.error("{} error: {}".format(err_code, message))
     return response
+
 
 def not_authenticated_error():
     return create_err_response("You must log in to access the requested resource", 401)

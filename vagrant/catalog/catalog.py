@@ -33,8 +33,10 @@ CLIENT_ID = json.loads(
 import dal
 from entities import AuthSource
 from handler_utils import (
+    jdefault,
     render,
     create_err_response,
+    create_json_response,
     already_exists_error,
     not_authenticated_error,
     not_authorized_error,
@@ -119,6 +121,24 @@ def categoryDelete(name):
         return not_authorized_error()
     dal.delete_category(cat.cat_id)
     return categoryList()
+
+
+@app.route('/catalog.json')
+def catalogDumpJSON():
+    categories = dal.get_categories()
+    items = dal.get_items()
+
+    cat_dict = {}
+    for i in categories:
+        i.items = []
+        cat_dict[i.cat_id] = i
+    for j in items:
+        cat_dict[j.cat_id].items.append(j)
+
+    output = [x for x in cat_dict.values()]
+    json_output = json.dumps(output, default=jdefault, indent=4)
+
+    return create_json_response(json_output)
 
 
 
