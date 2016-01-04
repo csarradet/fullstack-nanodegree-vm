@@ -3,10 +3,14 @@ This file contains helper functions to make our web handler code
 cleaner.
 """
 
+import time
+import datetime
 
 from flask import make_response, render_template
 import json
 from session_utils import get_active_user
+
+from rfc3339 import rfc3339
 
 import logging
 logging.basicConfig()
@@ -20,14 +24,33 @@ def jdefault(o):
     """
     return o.__dict__
 
+def date_to_atom_friendly(date):
+    """
+    Converts dates from our default representation to an Atom-friendly RFC-3339 format.
+    Uses a third party library released under a free license (see rfc3339.py for details).
+    Uses code from http://stackoverflow.com/questions/9637838/convert-string-date-to-timestamp-in-python
+    """
+    parsed = time.mktime(datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S").timetuple())
+    return rfc3339(parsed)
+
+
+def __create_response(obj, content_type, http_status_code):
+    response = make_response(obj, http_status_code)
+    response.headers["Content-Type"] = content_type
+    return response
+
+def create_atom_response(obj, http_status_code=200):
+    """
+    Dumps the provided object into a response with MIME type set for an Atom feed.
+    """
+    return __create_response(obj, "application/atom+xml", http_status_code)
+
 def create_json_response(obj, http_status_code=200):
     """
     Dumps the provided object into a JSON response and returns a success code.
     Assumes that obj is already in JSON format.
     """
-    response = make_response(obj, http_status_code)
-    response.headers["Content-Type"] = "application/json"
-    return response
+    return __create_response(obj, "application/json", http_status_code)
 
 def create_err_response(message, err_code):
     """ Ignores any remaining web handler code and logs + throws the provided error. """

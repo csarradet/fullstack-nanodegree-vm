@@ -213,7 +213,7 @@ def delete_item(item_id):
 def get_recent_items(count):
     output = []
     with get_cursor() as cursor:
-        cursor.execute('SELECT * FROM items ORDER BY created DESC LIMIT ?', (count,))
+        cursor.execute('SELECT * FROM items ORDER BY changed DESC LIMIT ?', (count,))
         result = cursor.fetchall()
     for row in result:
         output.append(entity_from_row(Item, row))

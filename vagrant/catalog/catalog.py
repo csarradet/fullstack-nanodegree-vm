@@ -34,7 +34,9 @@ import dal
 from entities import AuthSource
 from handler_utils import (
     jdefault,
+    date_to_atom_friendly,
     render,
+    create_atom_response,
     create_err_response,
     create_json_response,
     already_exists_error,
@@ -63,6 +65,44 @@ def download_static_file(filename):
 def helloWorld():
     """ Serves the splash page for the application. """
     return "Hello world"
+
+
+
+@app.route('/catalog.json')
+def jsonEndpoint():
+    """ Dumps all categories and items to JSON format """
+    categories = dal.get_categories()
+    items = dal.get_items()
+
+    cat_dict = {}
+    for i in categories:
+        i.items = []
+        cat_dict[i.cat_id] = i
+    for j in items:
+        cat_dict[j.cat_id].items.append(j)
+
+    output = [x for x in cat_dict.values()]
+    json_output = json.dumps(output, default=jdefault, indent=4)
+
+    return create_json_response(json_output)
+
+@app.route('/catalog.atom')
+def atomEndpoint():
+    """
+    Displays recently added items in Atom format.
+    Data is formatted as specified in http://atomenabled.org/developers/syndication/
+    and validated against https://validator.w3.org/feed/#validate_by_input/
+    """
+    last_updated = None
+    recent_items = dal.get_recent_items(10)
+    # Convert the dates to RFC-3339 format for Atom compatibility
+    for i in recent_items:
+       i.changed = date_to_atom_friendly(i.changed)
+    if recent_items:
+        last_updated = recent_items[0].changed
+    output = render("atom.xml", last_updated=last_updated, items=recent_items)
+    return create_atom_response(output)
+
 
 
 @app.route('/users/list')
@@ -121,24 +161,6 @@ def categoryDelete(name):
         return not_authorized_error()
     dal.delete_category(cat.cat_id)
     return categoryList()
-
-
-@app.route('/catalog.json')
-def catalogDumpJSON():
-    categories = dal.get_categories()
-    items = dal.get_items()
-
-    cat_dict = {}
-    for i in categories:
-        i.items = []
-        cat_dict[i.cat_id] = i
-    for j in items:
-        cat_dict[j.cat_id].items.append(j)
-
-    output = [x for x in cat_dict.values()]
-    json_output = json.dumps(output, default=jdefault, indent=4)
-
-    return create_json_response(json_output)
 
 
 

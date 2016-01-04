@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title>Catalogifier Recent Items</title>
+  <updated>{{ last_updated }}</updated>
+  <id>http://localhost:5000/</id>
+
+  {% for i in items %}
+  <entry>
+    <id>http://localhost:5000/items/by_id/{{ i.item_id }}/</id>
+    <title>{{ i.name }}</title>
+    <updated>{{ i.changed }}</updated>
+    <author>
+      <name>{{ i.creator_id }}</name>
+    </author>
+    <content>###Placeholder (add description here)###</content>
+  </entry>
+  {% endfor %}
+
+</feed>

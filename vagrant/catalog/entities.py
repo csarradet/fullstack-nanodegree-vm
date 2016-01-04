@@ -49,3 +49,4 @@ class Item(Entity):
     name = None
     cat_id = None
     creator_id = None
+    changed = None
