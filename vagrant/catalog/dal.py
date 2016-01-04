@@ -201,14 +201,23 @@ def get_item_by_name(cat_id, item_name):
 def create_item(name, category_id, creator_id):
     id = None
     with get_cursor() as cursor:
-        cursor.execute('INSERT INTO items VALUES (null, ?, ?, ?, ?)', (
-            name, category_id, creator_id, "now"))
+        cursor.execute("INSERT INTO items VALUES (null, ?, ?, ?, (DATETIME('now')))", (
+            name, category_id, creator_id))
         cursor.execute('SELECT last_insert_rowid()')
         id = cursor.fetchone()[0]
     return id
 
 def delete_item(item_id):
     __simple_delete("items", Item, "item_id", item_id)
+
+def get_recent_items(count):
+    output = []
+    with get_cursor() as cursor:
+        cursor.execute('SELECT * FROM items ORDER BY created DESC LIMIT ?', (count,))
+        result = cursor.fetchall()
+    for row in result:
+        output.append(entity_from_row(Item, row))
+    return output
 
 
 

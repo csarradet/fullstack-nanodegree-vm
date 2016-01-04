@@ -8,6 +8,7 @@
         <td>Name</td>
         <td>Category ID</td>
         <td>Creator ID</td>
+        <td>Date Created</td>
     </tr>
     {% for i in items %}
     <tr>
@@ -15,6 +16,7 @@
         <td>{{ i.name }}</td>
         <td>{{ i.cat_id }}</td>
         <td>{{ i.creator_id }}</td>
+        <td>{{ i.created }}</td>
     </tr>
     {% endfor %}
     </table>

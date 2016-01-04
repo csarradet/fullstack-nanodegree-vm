@@ -6,7 +6,6 @@ defines the methods that receive user input, perform safety checks,
 and interact with the DAL to perform CRUD operations.
 """
 
-
 import random
 import pprint
 import string
@@ -126,6 +125,11 @@ def categoryDelete(name):
 @app.route('/items/list')
 def itemList():
     item_list = dal.get_items()
+    return render("item_list.html", items=item_list)
+
+@app.route('/items/recent/<int:count>/')
+def itemRecent(count):
+    item_list = dal.get_recent_items(count)
     return render("item_list.html", items=item_list)
 
 @app.route('/items/by_id/<int:item_id>/')
