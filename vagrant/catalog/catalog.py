@@ -105,12 +105,12 @@ def atomEndpoint():
 
 
 
-@app.route('/users/list')
+@app.route('/user-list')
 def userList():
     user_list = dal.get_users()
     return render("user_list.html", users=user_list)
 
-@app.route('/users/by_id/<int:user_id>/')
+@app.route('/users/<int:user_id>/')
 def userLookup(user_id):
     user = [dal.get_user(user_id)]
     if not user:
@@ -118,27 +118,19 @@ def userLookup(user_id):
     return render("user_list.html", users=user)
 
 
-
-@app.route('/categories/list')
+@app.route('/category-list/')
 def categoryList():
     cat_list = dal.get_categories()
     return render("cat_list.html", categories=cat_list)
 
-@app.route('/categories/by_id/<int:cat_id>/')
-def categoryLookup(cat_id):
-    cat = [dal.get_category(cat_id)]
-    if not cat:
-        return not_found_error()
-    return render("cat_list.html", categories=cat)
-
-@app.route('/categories/by_name/<cat_name>/')
+@app.route('/catalog/<cat_name>/')
 def categoryNameLookup(cat_name):
     cat = [dal.get_category_by_name(cat_name)]
     if not cat:
         return not_found_error()
     return render("cat_list.html", categories=cat)
 
-@app.route('/categories/create/<name>/')
+@app.route('/catalog/<name>/create/')
 def categoryCreate(name):
     active_user = get_active_user()
     if not active_user:
@@ -149,7 +141,7 @@ def categoryCreate(name):
     cat_id = dal.create_category(name, active_user.user_id)
     return categoryList()
 
-@app.route('/categories/delete/<name>/')
+@app.route('/categories/<name>/delete/')
 def categoryDelete(name):
     cat = dal.get_category_by_name(name)
     if not cat:
@@ -164,24 +156,17 @@ def categoryDelete(name):
 
 
 
-@app.route('/items/list')
+@app.route('/item-list/')
 def itemList():
     item_list = dal.get_items()
     return render("item_list.html", items=item_list)
 
-@app.route('/items/recent/<int:count>/')
-def itemRecent(count):
+@app.route('/item-list/<int:count>/')
+def recentItems(count):
     item_list = dal.get_recent_items(count)
     return render("item_list.html", items=item_list)
 
-@app.route('/items/by_id/<int:item_id>/')
-def itemLookup(item_id):
-    item = [dal.get_item(item_id)]
-    if not item:
-        return not_found_error()
-    return render("item_list.html", items=item)
-
-@app.route('/categories/by_name/<cat_name>/items/list')
+@app.route('/catalog/<cat_name>/item-list/')
 def itemListByCategory(cat_name):
     cat = dal.get_category_by_name(cat_name)
     if not cat:
@@ -189,7 +174,7 @@ def itemListByCategory(cat_name):
     item_list = dal.get_items_by_cat(cat.cat_id)
     return render("item_list.html", items=item_list)
 
-@app.route('/categories/by_name/<cat_name>/items/create/<item_name>/')
+@app.route('/catalog/<cat_name>/<item_name>/create/')
 def itemCreate(cat_name, item_name):
     cat = dal.get_category_by_name(cat_name)
     if not cat:
@@ -203,7 +188,7 @@ def itemCreate(cat_name, item_name):
     item = dal.create_item(item_name, cat.cat_id, active_user.user_id)
     return itemListByCategory(cat_name)
 
-@app.route('/categories/by_name/<cat_name>/items/delete/<item_name>/')
+@app.route('/catalog/<cat_name>/<item_name>/delete/')
 def itemDelete(cat_name, item_name):
     cat = dal.get_category_by_name(cat_name)
     if not cat:
