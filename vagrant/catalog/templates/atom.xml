@@ -8,12 +8,12 @@
   {% for i in items %}
   <entry>
     <id>http://localhost:5000/items/by_id/{{ i.item_id }}/</id>
-    <title>{{ i.name }}</title>
+    <title>{{ i.cat_name }}\{{ i.name }}</title>
     <updated>{{ i.changed }}</updated>
     <author>
-      <name>{{ i.creator_id }}</name>
+      <name>{{ i.creator_name }}</name>
     </author>
-    <content>###Placeholder (add description here)###</content>
+    <content>{{ i.description }}</content>
   </entry>
   {% endfor %}
 
