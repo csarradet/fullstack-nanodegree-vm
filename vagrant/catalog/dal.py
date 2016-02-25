@@ -176,15 +176,15 @@ def delete_category(cat_id):
 
 
 def get_items():
-    return __simple_get_all("items", Item)
+    return __simple_get_all("pretty_items", Item)
 
 def get_item(item_id):
-    return __simple_get("items", Item, "item_id", item_id)
+    return __simple_get("pretty_items", Item, "item_id", item_id)
 
 def get_items_by_cat(cat_id):
     output = []
     with get_cursor() as cursor:
-        cursor.execute('SELECT * FROM items WHERE cat_id = ?', (cat_id,))
+        cursor.execute('SELECT * FROM pretty_items WHERE cat_id = ?', (cat_id,))
         result = cursor.fetchall()
     for row in result:
         output.append(entity_from_row(Item, row))
@@ -193,7 +193,7 @@ def get_items_by_cat(cat_id):
 def get_item_by_name(cat_id, item_name):
     output = None
     with get_cursor() as cursor:
-        cursor.execute('SELECT * FROM items WHERE cat_id = ? AND name = ?',
+        cursor.execute('SELECT * FROM pretty_items WHERE cat_id = ? AND name = ?',
             (cat_id, item_name,))
         output = entity_from_row(Item, cursor.fetchone())
     return output
@@ -215,7 +215,7 @@ def delete_item(item_id):
 def get_recent_items(count):
     output = []
     with get_cursor() as cursor:
-        cursor.execute('SELECT * FROM items ORDER BY changed DESC LIMIT ?', (count,))
+        cursor.execute('SELECT * FROM pretty_items ORDER BY changed DESC LIMIT ?', (count,))
         result = cursor.fetchall()
     for row in result:
         output.append(entity_from_row(Item, row))
@@ -243,10 +243,10 @@ def load_dummy_data():
     user2 = get_or_create_user("dummy2@user.com", AuthSource.DUMMY, 2002).user_id
     cat1 = create_category("Food", user1)
     cat2 = create_category("Explosives", user2)
-    item1_1 = create_item("Gagh", cat1, user1)
-    item1_2 = create_item("Roasted Tauntaun", cat1, user2)
-    item2_1 = create_item("Red Matter", cat2, user1)
-    item2_2 = create_item("Thermal Detonator", cat2, user2)
+    item1_1 = create_item("Gagh", cat1, user1, "Very fresh")
+    item1_2 = create_item("Roasted Tauntaun", cat1, user2, "Also smells bad on the inside")
+    item2_1 = create_item("Red Matter", cat2, user1, "For destroying planets")
+    item2_2 = create_item("Thermal Detonator", cat2, user2, "For destroying buildings")
 
 
 
