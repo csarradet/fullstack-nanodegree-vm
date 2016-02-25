@@ -198,11 +198,13 @@ def get_item_by_name(cat_id, item_name):
         output = entity_from_row(Item, cursor.fetchone())
     return output
 
-def create_item(name, category_id, creator_id):
+def create_item(name, category_id, creator_id, description=None):
     id = None
+    if description is None:
+        description = "Placeholder item description"
     with get_cursor() as cursor:
-        cursor.execute("INSERT INTO items VALUES (null, ?, ?, ?, (DATETIME('now')))", (
-            name, category_id, creator_id))
+        cursor.execute("INSERT INTO items VALUES (null, ?, ?, ?, ?, (DATETIME('now')))", (
+            name, description, category_id, creator_id))
         cursor.execute('SELECT last_insert_rowid()')
         id = cursor.fetchone()[0]
     return id

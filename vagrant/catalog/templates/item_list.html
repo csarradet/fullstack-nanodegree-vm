@@ -6,16 +6,22 @@
     <tr>
         <td>Local ID</td>
         <td>Name</td>
+        <td>Description</td>
         <td>Category ID</td>
+        <td>Category Name</td>
         <td>Creator ID</td>
-        <td>Date Created</td>
+        <td>Creator Name</td>
+        <td>Date Changed</td>
     </tr>
     {% for i in items %}
     <tr>
         <td>{{ i.item_id }}</td>
         <td>{{ i.name }}</td>
+        <td>{{ i.description }}</td>
         <td>{{ i.cat_id }}</td>
+        <td>{{ i.cat_name }}</td>
         <td>{{ i.creator_id }}</td>
+        <td>{{ i.creator_name }}</td>
         <td>{{ i.changed }}</td>
     </tr>
     {% endfor %}
