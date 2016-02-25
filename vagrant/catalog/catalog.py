@@ -1,7 +1,7 @@
 """
 This file houses the bulk of our business logic layer.
 
-It defines all routes used by our web application, and
+It presents all routes used by our web application, and
 defines the methods that receive user input, perform safety checks,
 and interact with the DAL to perform CRUD operations.
 """
@@ -64,6 +64,7 @@ def download_static_file(filename):
 @app.route('/')
 def helloWorld():
     """ Serves the splash page for the application. """
+    # TODO
     return "Hello world"
 
 
@@ -91,7 +92,7 @@ def atomEndpoint():
     """
     Displays recently added items in Atom format.
     Data is formatted as specified in http://atomenabled.org/developers/syndication/
-    and validated against https://validator.w3.org/feed/#validate_by_input/
+    and was validated against https://validator.w3.org/feed/#validate_by_input/
     """
     last_updated = None
     recent_items = dal.get_recent_items(10)
@@ -130,20 +131,20 @@ def categoryNameLookup(cat_name):
         return not_found_error()
     return render("cat_list.html", categories=cat)
 
-@app.route('/catalog/<name>/create/')
-def categoryCreate(name):
+@app.route('/catalog/<cat_name>/create/')
+def categoryCreate(cat_name):
     active_user = get_active_user()
     if not active_user:
         return not_authenticated_error()
-    duplicate = dal.get_category_by_name(name)
+    duplicate = dal.get_category_by_name(cat_name)
     if duplicate:
         return already_exists_error()
-    cat_id = dal.create_category(name, active_user.user_id)
+    cat_id = dal.create_category(cat_name, active_user.user_id)
     return categoryList()
 
-@app.route('/categories/<name>/delete/')
-def categoryDelete(name):
-    cat = dal.get_category_by_name(name)
+@app.route('/categories/<cat_name>/delete/')
+def categoryDelete(cat_name):
+    cat = dal.get_category_by_name(cat_name)
     if not cat:
         return not_found_error()
     active_user = get_active_user()

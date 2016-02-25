@@ -39,7 +39,7 @@ def get_cursor():
             cursor.execute("delete from matches;")
     """
     conn = sqlite3.connect("catalog.db")
-    # This wrapper adds the ability to access a row's fields by column name,
+    # This Row wrapper adds the ability to access a row's fields by column name,
     # allowing us to auto-convert them to entities as long as the field names
     # match (see entity_from_row()).
     conn.row_factory = sqlite3.Row
@@ -152,13 +152,13 @@ def create_user(username, auth_source, auth_source_id):
 
 
 def get_categories():
-    return __simple_get_all("categories", Category)
+    return __simple_get_all("pretty_categories", Category)
 
 def get_category(cat_id):
-    return __simple_get("categories", Category, "cat_id", cat_id)
+    return __simple_get("pretty_categories", Category, "cat_id", cat_id)
 
 def get_category_by_name(cat_name):
-    return __simple_get("categories", Category, "name", cat_name)
+    return __simple_get("pretty_categories", Category, "name", cat_name)
 
 def create_category(name, creator_id):
     """ Creates a new category record and returns its ID number. """

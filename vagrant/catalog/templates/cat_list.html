@@ -7,12 +7,14 @@
         <td>Local ID</td>
         <td>Name</td>
         <td>Creator ID</td>
+        <td>Creator Name</td>
     </tr>
     {% for i in categories %}
     <tr>
         <td>{{ i.cat_id }}</td>
         <td>{{ i.name }}</td>
         <td>{{ i.creator_id }}</td>
+        <td>{{ i.creator_name }}</td>
     </tr>
     {% endfor %}
     </table>

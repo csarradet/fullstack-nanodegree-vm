@@ -5,7 +5,8 @@ PRAGMA foreign_keys=ON;
 DROP TABLE IF EXISTS items;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS users;
-
+DROP VIEW IF EXISTS pretty_categories;
+DROP VIEW IF EXISTS pretty_items;
 
 -- Create tables --
 CREATE TABLE users (
@@ -35,4 +36,18 @@ CREATE TABLE items (
     );
 
 
+-- Create views --
+CREATE VIEW pretty_categories AS
+    SELECT c.cat_id, c.name, c.creator_id,
+        u.username AS creator_name
+    FROM categories AS c JOIN users AS u ON (c.creator_id = u.user_id)
+    ;
 
+CREATE VIEW pretty_items AS
+    SELECT i.item_id, i.name, i.cat_id, i.creator_id, i.changed,
+        u.username AS creator_name,
+        c.name AS cat_name
+    FROM items AS i
+        JOIN users AS u ON (i.creator_id = u.user_id)
+        JOIN categories AS c ON (i.cat_id = c.cat_id)
+    ;
