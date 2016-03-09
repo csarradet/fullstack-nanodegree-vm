@@ -71,6 +71,9 @@ def not_found_error():
 def already_exists_error():
     return create_err_response("Unable to create -- that resource already exists", 400)
 
+def internal_error():
+    return create_err_response("Internal server error", 500)
+
 def render(filename, **kwargs):
     """
     Decorator for flask's render_template() function.

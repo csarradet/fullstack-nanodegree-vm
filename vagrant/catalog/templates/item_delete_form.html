@@ -1,0 +1,11 @@
+{% extends "template_base.html" %}
+
+{% block content %}
+
+Delete the item named {{ cat_name }}/{{ item_name }}?
+
+<form method="POST">
+    <input type="submit" value="Confirm" />
+</form>
+
+{% endblock %}

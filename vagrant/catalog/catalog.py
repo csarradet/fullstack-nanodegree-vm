@@ -42,7 +42,8 @@ from handler_utils import (
     already_exists_error,
     not_authenticated_error,
     not_authorized_error,
-    not_found_error
+    not_found_error,
+    internal_error
     )
 from session_utils import (
     SessionKeys,
@@ -206,13 +207,22 @@ def itemCreate(cat_name, item_name):
     if duplicate:
         return already_exists_error()
     desc = request.values.get("description")
-    item = dal.create_item(item_name, cat.cat_id, active_user.user_id, desc)
+    item_id = dal.create_item(item_name, cat.cat_id, active_user.user_id, desc)
+    if not item_id:
+        return internal_error()
     return render("item_create_success.html",
         cat_name=cat_name,
         item_name=item_name,
-        desc=desc)
+        item_id=item_id,
+        desc=desc,
+        )
 
-@app.route('/catalog/<cat_name>/<item_name>/delete/')
+
+@app.route('/catalog/<cat_name>/<item_name>/delete/', methods=['GET'])
+def itemDeleteForm(cat_name, item_name):
+    return render("item_delete_form.html", cat_name=cat_name, item_name=item_name)
+
+@app.route('/catalog/<cat_name>/<item_name>/delete/', methods=['POST'])
 def itemDelete(cat_name, item_name):
     cat = dal.get_category_by_name(cat_name)
     if not cat:
@@ -226,7 +236,7 @@ def itemDelete(cat_name, item_name):
     if active_user.user_id != item.creator_id:
         return not_authorized_error()
     dal.delete_item(item.item_id)
-    return itemListByCategory(cat_name)
+    return render("item_delete_success.html", cat_name=cat_name, item_name=item_name)
 
 
 
@@ -320,6 +330,5 @@ if __name__ == '__main__':
     app.debug = True
     app.secret_key = "abc123"
     app.config["SESSION_TYPE"] = "filesystem"
-    dal.session_setup()
     print "Starting catalogifier web service; press ctrl-c to exit."
     app.run(host = '0.0.0.0', port = 5000)

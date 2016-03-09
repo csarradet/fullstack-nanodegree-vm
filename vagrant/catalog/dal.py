@@ -38,7 +38,7 @@ def get_cursor():
         with with_cursor() as cursor:
             cursor.execute("delete from matches;")
     """
-    conn = sqlite3.connect("catalog.db")
+    conn = sqlite3.connect("data source=catalog.db; foreign keys=true;")
     # This Row wrapper adds the ability to access a row's fields by column name,
     # allowing us to auto-convert them to entities as long as the field names
     # match (see entity_from_row()).
@@ -109,6 +109,7 @@ def __simple_delete(table_name, entity_class, search_field, search_text):
     Deletes all entities of type entity_class from table_name with the given ID.
     """
     with get_cursor() as cursor:
+        cursor.execute('PRAGMA foreign_keys = ON')
         cursor.execute('DELETE FROM {} WHERE {} = ?'.format(table_name, search_field), (search_text,))
 
 
@@ -234,16 +235,6 @@ def initial_db_setup():
     with get_cursor() as cursor:
         cursor.executescript(qry)
     print(" - DB initial setup complete")
-
-def session_setup():
-    """
-    Call once when spinning up an app instance.
-    Runs any code required to prepare the DB for activity
-    (just enabling foreign keys as per SQLite requirements, in this case).
-    """
-    with get_cursor() as cursor:
-        cursor.execute("PRAGMA foreign_keys = ON;")
-    print(" - DB session setup complete")
 
 def load_dummy_data():
     """
