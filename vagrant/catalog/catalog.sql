@@ -27,7 +27,7 @@ CREATE TABLE categories (
     cat_id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     creator_id INTEGER NOT NULL,
-    FOREIGN KEY(creator_id) REFERENCES users(user_id)
+    FOREIGN KEY(creator_id) REFERENCES users(user_id) ON DELETE CASCADE
     );
 
 CREATE TABLE items (
@@ -37,8 +37,8 @@ CREATE TABLE items (
     cat_id INTEGER NOT NULL,
     creator_id INTEGER NOT NULL,
     changed DATETIME NOT NULL,
-    FOREIGN KEY(cat_id) REFERENCES categories(cat_id),
-    FOREIGN KEY(creator_id) REFERENCES users(user_id)
+    FOREIGN KEY(cat_id) REFERENCES categories(cat_id) ON DELETE CASCADE,
+    FOREIGN KEY(creator_id) REFERENCES users(user_id) ON DELETE CASCADE
     );
 
 

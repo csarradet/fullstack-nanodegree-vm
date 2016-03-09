@@ -65,7 +65,7 @@ def download_static_file(filename):
 def helloWorld():
     """ Serves the splash page for the application. """
     # TODO
-    return "Hello world"
+    return render("dashboard.html")
 
 
 
@@ -159,7 +159,6 @@ def categoryDeleteForm(cat_name):
 @app.route('/catalog/<cat_name>/delete/', methods=['POST'])
 def categoryDelete(cat_name):
     cat = dal.get_category_by_name(cat_name)
-    print "cat: {}".format(cat)
     if not cat:
         return not_found_error()
     active_user = get_active_user()
@@ -190,7 +189,12 @@ def itemListByCategory(cat_name):
     item_list = dal.get_items_by_cat(cat.cat_id)
     return render("item_list.html", items=item_list)
 
-@app.route('/catalog/<cat_name>/<item_name>/create/')
+
+@app.route('/catalog/<cat_name>/<item_name>/create/', methods=['GET'])
+def itemCreateForm(cat_name, item_name):
+    return render("item_create_form.html", cat_name=cat_name, item_name=item_name)
+
+@app.route('/catalog/<cat_name>/<item_name>/create/', methods=['POST'])
 def itemCreate(cat_name, item_name):
     cat = dal.get_category_by_name(cat_name)
     if not cat:
@@ -201,8 +205,12 @@ def itemCreate(cat_name, item_name):
     duplicate = dal.get_item_by_name(cat.cat_id, item_name)
     if duplicate:
         return already_exists_error()
-    item = dal.create_item(item_name, cat.cat_id, active_user.user_id)
-    return itemListByCategory(cat_name)
+    desc = request.values.get("description")
+    item = dal.create_item(item_name, cat.cat_id, active_user.user_id, desc)
+    return render("item_create_success.html",
+        cat_name=cat_name,
+        item_name=item_name,
+        desc=desc)
 
 @app.route('/catalog/<cat_name>/<item_name>/delete/')
 def itemDelete(cat_name, item_name):
@@ -312,5 +320,6 @@ if __name__ == '__main__':
     app.debug = True
     app.secret_key = "abc123"
     app.config["SESSION_TYPE"] = "filesystem"
+    dal.session_setup()
     print "Starting catalogifier web service; press ctrl-c to exit."
     app.run(host = '0.0.0.0', port = 5000)

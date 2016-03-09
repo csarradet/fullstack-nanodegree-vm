@@ -1,0 +1,12 @@
+{% extends "template_base.html" %}
+
+{% block content %}
+
+Create a new item named {{ cat_name }}/{{ item_name }}?
+
+<form method="POST">
+    Description: <input type="text" name="description" /><br />
+    <input type="submit" value="Confirm" />
+</form>
+
+{% endblock %}

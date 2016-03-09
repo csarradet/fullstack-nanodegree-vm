@@ -223,7 +223,7 @@ def get_recent_items(count):
 
 
 
-def setup_db():
+def initial_db_setup():
     """
     Executes our database setup script (this will wipe any existing data).
     Uses a code snippet from http://stackoverflow.com/questions/2380553/sqlite-run-multi-line-sql-script-from-file
@@ -233,7 +233,17 @@ def setup_db():
     qry = open("catalog.sql", "r").read()
     with get_cursor() as cursor:
         cursor.executescript(qry)
-    print(" - DB setup complete")
+    print(" - DB initial setup complete")
+
+def session_setup():
+    """
+    Call once when spinning up an app instance.
+    Runs any code required to prepare the DB for activity
+    (just enabling foreign keys as per SQLite requirements, in this case).
+    """
+    with get_cursor() as cursor:
+        cursor.execute("PRAGMA foreign_keys = ON;")
+    print(" - DB session setup complete")
 
 def load_dummy_data():
     """
@@ -252,6 +262,6 @@ def load_dummy_data():
 
 if __name__ == '__main__':
     print("Setting up DB")
-    setup_db()
+    initial_db_setup()
     print("Creating dummy records")
     load_dummy_data()
