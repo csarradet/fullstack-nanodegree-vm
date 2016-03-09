@@ -131,7 +131,12 @@ def categoryNameLookup(cat_name):
         return not_found_error()
     return render("cat_list.html", categories=cat)
 
-@app.route('/catalog/<cat_name>/create/')
+
+@app.route('/catalog/<cat_name>/create/', methods=['GET'])
+def categoryCreateForm(cat_name):
+    return render("cat_create_form.html", cat_name=cat_name)
+
+@app.route('/catalog/<cat_name>/create/', methods=['POST'])
 def categoryCreate(cat_name):
     active_user = get_active_user()
     if not active_user:
@@ -140,7 +145,10 @@ def categoryCreate(cat_name):
     if duplicate:
         return already_exists_error()
     cat_id = dal.create_category(cat_name, active_user.user_id)
-    return categoryList()
+    return render("cat_create_success.html",
+        cat_name=cat_name,
+        cat_id=cat_id,
+        owner_name=active_user.username)
 
 @app.route('/categories/<cat_name>/delete/')
 def categoryDelete(cat_name):
