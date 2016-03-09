@@ -119,6 +119,7 @@ def userLookup(user_id):
     return render("user_list.html", users=user)
 
 
+
 @app.route('/category-list/')
 def categoryList():
     cat_list = dal.get_categories()
@@ -150,9 +151,15 @@ def categoryCreate(cat_name):
         cat_id=cat_id,
         owner_name=active_user.username)
 
-@app.route('/categories/<cat_name>/delete/')
+
+@app.route('/catalog/<cat_name>/delete/', methods=['GET'])
+def categoryDeleteForm(cat_name):
+    return render("cat_delete_form.html", cat_name=cat_name)
+
+@app.route('/catalog/<cat_name>/delete/', methods=['POST'])
 def categoryDelete(cat_name):
     cat = dal.get_category_by_name(cat_name)
+    print "cat: {}".format(cat)
     if not cat:
         return not_found_error()
     active_user = get_active_user()
@@ -161,7 +168,7 @@ def categoryDelete(cat_name):
     if active_user.user_id != cat.creator_id:
         return not_authorized_error()
     dal.delete_category(cat.cat_id)
-    return categoryList()
+    return render("cat_delete_success.html", cat_name=cat_name)
 
 
 

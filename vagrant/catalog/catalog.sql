@@ -1,4 +1,9 @@
 -- Enforce foreign key constraints --
+-- (Note that we use cascading deletes below -- this is just
+--  to make the project code simpler.  In production more
+--  robust controls would be added to the business logic
+--  layer instead.)
+
 PRAGMA foreign_keys=ON;
 
 -- Wipe any existing data --
