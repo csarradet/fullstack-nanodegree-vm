@@ -249,10 +249,13 @@ def logout():
 @app.route('/login')
 def showLogin():
     """ Creates a nonce and displays the page listing available login options. """
-    state = "".join(random.choice(string.ascii_uppercase +
-        string.digits) for x in xrange(32))
+    state = gibberish()
     session[SessionKeys.STATE] = state
     return render("login.html", STATE=state)
+
+def gibberish(len=32):
+    return "".join(random.choice(string.ascii_uppercase +
+        string.digits) for x in xrange(len))
 
 @app.route('/gconnect', methods=["POST"])
 def gconnect():
@@ -261,10 +264,7 @@ def gconnect():
     Most of this code was adapted from the intro course on authentication.
     """
     if request.args.get('state') != session[SessionKeys.STATE]:
-        return create_err_response(
-            "Invalid state parameter ([{}] vs. [{}])".format(
-                request.args.get('state'), session[SessionKeys.STATE]),
-            401)
+        return create_err_response("Invalid state parameter", 401)
     code = request.data
     try:
         scope = "email profile"

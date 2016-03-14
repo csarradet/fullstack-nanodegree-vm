@@ -76,41 +76,46 @@ def entity_from_row(entity_class, row):
     except KeyError:
         return None
 
-def __simple_get_all(table_name, entity_class):
+def __simple_get_all(UNSAFE_table_name, UNSAFE_entity_class):
     """
-    table_name and entity_class will be processed through simple string formatting;
+    UNSAFE fields may be processed through simple string formatting;
     *do not* send user input to these fields.
+
     Gets all entities of type entity_class from the given table.
     """
     output = []
     with get_cursor() as cursor:
-        cursor.execute('SELECT * FROM {}'.format(table_name))
+        cursor.execute('SELECT * FROM {}'.format(UNSAFE_table_name))
         result = cursor.fetchall()
     for row in result:
-        output.append(entity_from_row(entity_class, row))
+        output.append(entity_from_row(UNSAFE_entity_class, row))
     return output
 
-def __simple_get(table_name, entity_class, search_field, search_text):
+def __simple_get(UNSAFE_table_name, UNSAFE_entity_class, UNSAFE_search_field, search_text):
     """
-    search_field, table_name and entity_class will be processed through simple string formatting;
+    UNSAFE fields may be processed through simple string formatting;
     *do not* send user input to these fields.
+
     Gets the first entity of type entity_class from table_name with the given ID.
     """
     output = None
     with get_cursor() as cursor:
-        cursor.execute('SELECT * FROM {} WHERE {} = ? LIMIT 1'.format(table_name, search_field), (search_text,))
-        output = entity_from_row(entity_class, cursor.fetchone())
+        cursor.execute('SELECT * FROM {} WHERE {} = ? LIMIT 1'.format(
+            UNSAFE_table_name, UNSAFE_search_field), (search_text,))
+        output = entity_from_row(UNSAFE_entity_class, cursor.fetchone())
     return output
 
-def __simple_delete(table_name, entity_class, search_field, search_text):
+def __simple_delete(UNSAFE_table_name, UNSAFE_entity_class, UNSAFE_search_field, search_text):
     """
-    search_field, table_name and entity_class will be processed through simple string formatting;
+    UNSAFE fields may be processed through simple string formatting;
     *do not* send user input to these fields.
+
     Deletes all entities of type entity_class from table_name with the given ID.
     """
     with get_cursor() as cursor:
         cursor.execute('PRAGMA foreign_keys = ON')
-        cursor.execute('DELETE FROM {} WHERE {} = ?'.format(table_name, search_field), (search_text,))
+        cursor.execute('DELETE FROM {} WHERE {} = ?'.format(
+            UNSAFE_table_name, UNSAFE_search_field), (search_text,))
 
 
 
