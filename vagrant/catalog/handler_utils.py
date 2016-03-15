@@ -16,6 +16,7 @@ import logging
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 
+from dal import list_items_by_cat
 
 def jdefault(o):
     """
@@ -84,4 +85,5 @@ def render(filename, **kwargs):
     required by our base template, like info on the logged in user.
     """
     kwargs["current_user"] = get_active_user()
+    kwargs["items_by_cat"] = list_items_by_cat()
     return render_template(filename, **kwargs)
