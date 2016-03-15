@@ -6,10 +6,6 @@ defines the methods that receive user input, perform safety checks,
 and interact with the DAL to perform CRUD operations.
 """
 
-import random
-import pprint
-import string
-
 import logging
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -49,6 +45,8 @@ from session_utils import (
     SessionKeys,
     save_to_session,
     load_from_session,
+    generate_nonce,
+    check_nonce,
     set_active_user,
     get_active_user
     )
@@ -249,13 +247,10 @@ def logout():
 @app.route('/login')
 def showLogin():
     """ Creates a nonce and displays the page listing available login options. """
-    state = gibberish()
-    session[SessionKeys.STATE] = state
+    state = generate_nonce()
     return render("login.html", STATE=state)
 
-def gibberish(len=32):
-    return "".join(random.choice(string.ascii_uppercase +
-        string.digits) for x in xrange(len))
+
 
 @app.route('/gconnect', methods=["POST"])
 def gconnect():
@@ -263,13 +258,12 @@ def gconnect():
     Receives and processes Google Plus login requests.
     Most of this code was adapted from the intro course on authentication.
     """
-    if request.args.get('state') != session[SessionKeys.STATE]:
+    if not check_nonce(request.args.get('state')):
         return create_err_response("Invalid state parameter", 401)
     code = request.data
     try:
-        scope = "email profile"
-
         # Upgrade the authorization code into a credentials object
+        scope = "email profile"
         oauth_flow = flow_from_clientsecrets("client_secrets.json", scope=scope)
         oauth_flow.redirect_uri = "postmessage"
         credentials = oauth_flow.step2_exchange(code)
