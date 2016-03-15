@@ -205,6 +205,19 @@ def itemListByCategory(cat_name):
     item_list = dal.get_items_by_cat(cat.cat_id)
     return render("item_list.html", items=item_list)
 
+@app.route('/catalog/<cat_name>/<item_name>/')
+def itemLookup(cat_name, item_name):
+    cat = dal.get_category_by_name(cat_name)
+    if not cat:
+        return not_found_error()
+
+    item = dal.get_item_by_name(cat.cat_id, item_name)
+    if not item:
+        return not_found_error()
+
+    # All checks passed, display the item
+    return render("item_list.html", items=[item])
+
 
 @app.route('/catalog/<cat_name>/<item_name>/create/', methods=['GET'])
 def itemCreateForm(cat_name, item_name):
