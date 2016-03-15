@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import httplib2
+import bleach
 import imghdr
 import base64
 import json
@@ -258,7 +259,7 @@ def itemCreate(cat_name, item_name):
         return bad_request_error()
 
     # All checks passed, create the item and show the success page
-    desc = request.values.get("description")
+    desc = bleach.clean(request.values.get("description"))
     item_id = dal.create_item(
         item_name, cat.cat_id, active_user.user_id, pic_data, desc)
     if not item_id:
@@ -267,7 +268,7 @@ def itemCreate(cat_name, item_name):
     item = dal.get_item(item_id)
     if not item:
         logging.error(
-            "Unable to create item: item_id {} does not have a matching instance".format(item_id))
+            "Unable to create item: an instance was not created for item_id {}".format(item_id))
         return internal_error()
     return render("item_create_success.html",
         cat_name=cat_name,
