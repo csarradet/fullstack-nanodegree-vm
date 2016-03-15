@@ -181,6 +181,7 @@ def categoryDelete(cat_name):
     if active_user.user_id != cat.creator_id:
         return not_authorized_error()
 
+    # All checks passed, delete the category and show the success page
     dal.delete_category(cat.cat_id)
     return render("cat_delete_success.html", cat_name=cat_name)
 
@@ -207,19 +208,29 @@ def itemListByCategory(cat_name):
 
 @app.route('/catalog/<cat_name>/<item_name>/create/', methods=['GET'])
 def itemCreateForm(cat_name, item_name):
-    return render("item_create_form.html", cat_name=cat_name, item_name=item_name)
+    state = generate_nonce()
+    return render("item_create_form.html",
+        cat_name=cat_name, item_name=item_name, state=state)
 
 @app.route('/catalog/<cat_name>/<item_name>/create/', methods=['POST'])
 def itemCreate(cat_name, item_name):
+    state = request.values.get('state')
+    if not check_nonce(state):
+        return bad_credentials_error()
+
     cat = dal.get_category_by_name(cat_name)
     if not cat:
         return not_found_error()
+
     active_user = get_active_user()
     if not active_user:
         return not_authenticated_error()
+
     duplicate = dal.get_item_by_name(cat.cat_id, item_name)
     if duplicate:
         return already_exists_error()
+
+    # All checks passed, create the item and show the success page
     desc = request.values.get("description")
     item_id = dal.create_item(item_name, cat.cat_id, active_user.user_id, desc)
     if not item_id:
