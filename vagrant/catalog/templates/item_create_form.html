@@ -4,8 +4,9 @@
 
 Create a new item named {{ cat_name }}/{{ item_name }}?
 
-<form method="POST">
+<form method="POST" enctype="multipart/form-data">
     Description: <input type="text" name="description" /><br />
+    Picture (.jpg only): <input type="file" name="picture" accept=".jpg" /><br />
     <input type="hidden" name="state" value="{{ state }}" />
     <input type="submit" value="Confirm" />
 </form>

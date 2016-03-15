@@ -59,8 +59,8 @@ def create_err_response(message, err_code):
     return response
 
 
-def bad_credentials_error():
-    return create_err_response("Invalid credentials provided", 400)
+def bad_request_error():
+    return create_err_response("Your request contained invalid data", 400)
 
 def not_authenticated_error():
     return create_err_response("You must log in to access the requested resource", 401)

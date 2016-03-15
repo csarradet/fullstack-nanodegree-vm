@@ -13,14 +13,16 @@ logger = logging.getLogger(__name__)
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import httplib2
+import imghdr
 import json
 import requests
+from werkzeug import secure_filename
 from flask import (
     Flask,
     flash,
     redirect,
     request,
-    session
+    session,
     )
 app = Flask(__name__)
 CLIENT_ID = json.loads(
@@ -36,7 +38,7 @@ from handler_utils import (
     create_err_response,
     create_json_response,
     already_exists_error,
-    bad_credentials_error,
+    bad_request_error,
     not_authenticated_error,
     not_authorized_error,
     not_found_error,
@@ -142,7 +144,7 @@ def categoryCreateForm(cat_name):
 def categoryCreate(cat_name):
     state = request.values.get('state')
     if not check_nonce(state):
-        return bad_credentials_error()
+        return bad_request_error()
 
     active_user = get_active_user()
     if not active_user:
@@ -169,7 +171,7 @@ def categoryDeleteForm(cat_name):
 def categoryDelete(cat_name):
     state = request.values.get('state')
     if not check_nonce(state):
-        return bad_credentials_error()
+        return bad_request_error()
 
     cat = dal.get_category_by_name(cat_name)
     if not cat:
@@ -229,7 +231,7 @@ def itemCreateForm(cat_name, item_name):
 def itemCreate(cat_name, item_name):
     state = request.values.get('state')
     if not check_nonce(state):
-        return bad_credentials_error()
+        return bad_request_error()
 
     cat = dal.get_category_by_name(cat_name)
     if not cat:
@@ -243,6 +245,11 @@ def itemCreate(cat_name, item_name):
     if duplicate:
         return already_exists_error()
 
+    # Picture validation uses code from http://flask.pocoo.org/docs/0.10/patterns/fileuploads/
+    pic = request.files["picture"]
+    if not validate_picture(pic):
+        return bad_request_error()
+
     # All checks passed, create the item and show the success page
     desc = request.values.get("description")
     item_id = dal.create_item(item_name, cat.cat_id, active_user.user_id, desc)
@@ -255,6 +262,32 @@ def itemCreate(cat_name, item_name):
         desc=desc,
         )
 
+def validate_picture(pic):
+    """
+    Side effect: changes pic.filename to its secure_filename() equivalent.
+    Returns true if pic is a valid picture file that can be safely committed to the DB,
+        OR if it's falsy (and will be replaced by a null/placeholder).
+    """
+    if not pic:
+        return True
+
+    pic.filename = secure_filename(pic.filename)
+    if not pic.filename.endswith(".jpg"):
+        logging.error("Picture validation failed: invalid extension")
+        return False
+    if len(pic.filename) <= 4:
+        logging.error("Picture validation failed: invalid filename length")
+        return False
+    # Snoop into the file's data to ensure it actually contains a jpg image
+    content = pic.read()
+    if not imghdr.what("", h=content) == 'jpeg':
+        logging.error("Picture validation failed: invalid file contents")
+        return False
+
+    # All checks passed
+    return True
+
+
 
 @app.route('/catalog/<cat_name>/<item_name>/delete/', methods=['GET'])
 def itemDeleteForm(cat_name, item_name):
@@ -266,7 +299,7 @@ def itemDeleteForm(cat_name, item_name):
 def itemDelete(cat_name, item_name):
     state = request.values.get('state')
     if not check_nonce(state):
-        return bad_credentials_error()
+        return bad_request_error()
 
     cat = dal.get_category_by_name(cat_name)
     if not cat:
