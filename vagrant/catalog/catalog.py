@@ -137,12 +137,8 @@ def categoryNameLookup(cat_name):
     return render("cat_list.html", categories=cat)
 
 
-@app.route('/catalog/<cat_name>/create/', methods=['GET'])
-def categoryCreateForm(cat_name):
-    return render("cat_create_form.html", cat_name=cat_name)
-
-@app.route('/catalog/<cat_name>/create/', methods=['POST'])
-def categoryCreate(cat_name):
+@app.route('/catalog/create/', methods=['POST'])
+def categoryCreate():
     state = request.values.get('state')
     if not check_nonce(state):
         return bad_request_error()
@@ -151,6 +147,7 @@ def categoryCreate(cat_name):
     if not active_user:
         return not_authenticated_error()
 
+    cat_name = bleach.clean(request.values.get("cat_create_name"))
     duplicate = dal.get_category_by_name(cat_name)
     if duplicate:
         return already_exists_error()

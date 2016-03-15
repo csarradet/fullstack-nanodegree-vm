@@ -32,13 +32,13 @@
                     <h4 class="modal-title">Create New Category</h4>
                 </div>
                 <div class="modal-body">
-                    <form>
-                        <input type="text" name="state">{{ state }}</input>
+                    <form method="POST" action="/catalog/create/">
+                        <input type="text" name="state" value="{{ state }}"></input><br />
                         
                         <label for="cat_create_name">Name:</label>
-                        <input id="cat_create_name" type="text" name="state"></input>
+                        <input type="text" id="cat_create_name" name="cat_create_name"></input><br />
                         
-                        <input type="submit" text="state">Confirm</input>
+                        <input type="submit">Confirm</input>
 
                     </form>
                 </div>
