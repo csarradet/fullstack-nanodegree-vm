@@ -43,19 +43,36 @@
     <!-- bootstrap layout container (everything below the navbar) -->
     <div class="container">
         <div class="row">
+
             <!-- body panel 1: left sidebar -->
-            <div id="sidebar" class="col-md-2 list-group">
+            <!-- Uses sample code from http://www.w3schools.com/bootstrap/bootstrap_collapse.asp -->
+            <div id="accordion" class="col-xs-2 panel-group">
+                {% set cat_count = 0 %}
                 {% for cat in items_by_cat %}
-                <div class="list-group-item active">{{ cat[0] }}</div>
-                    {% for item in cat[1] %}
-                    <div class="list-group-item">
-                        <a href="/catalog/{{ cat[0] }}/{{ item }}">{{ item }}</a>
+                {% set cat_count = cat_count + 1 %}
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ cat_count }}">
+                                {{ cat[0] }}
+                            </a>
+                        </div>
                     </div>
-                    {% endfor %}
+                    <div id="collapse{{ cat_count }}" class="panel-collapse collapse{% if active_cat == cat[0] %} in{% endif %}">
+                        {% for item in cat[1] %}
+                        <div class="list-group-item">
+                            <a href="/catalog/{{ cat[0] }}/{{ item }}">{{ item }}</a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
                 {% endfor %}
             </div>
+
             <!-- body panel 2: right content pane -->
-            <div id="content" class="col-md-8">{% block content %}{% endblock %}</div>
+            <div id="content" class="col-xs-8">
+                {% block content %}{% endblock %}
+            </div>
         </div>
     </div> <!-- /container -->
 
