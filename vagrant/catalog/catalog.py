@@ -262,6 +262,12 @@ def itemCreate(cat_name, item_name):
     item_id = dal.create_item(
         item_name, cat.cat_id, active_user.user_id, pic_data, desc)
     if not item_id:
+        logging.error("Unable to create item: did not receive an item_id from database")
+        return internal_error()
+    item = dal.get_item(item_id)
+    if not item:
+        logging.error(
+            "Unable to create item: item_id {} does not have a matching instance".format(item_id))
         return internal_error()
     return render("item_create_success.html",
         cat_name=cat_name,
