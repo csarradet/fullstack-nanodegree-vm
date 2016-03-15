@@ -140,13 +140,13 @@ def categoryCreateForm(cat_name):
 
 @app.route('/catalog/<cat_name>/create/', methods=['POST'])
 def categoryCreate(cat_name):
-    active_user = get_active_user()
-    if not active_user:
-        return not_authenticated_error()
-
     state = request.values.get('state')
     if not check_nonce(state):
         return bad_credentials_error()
+
+    active_user = get_active_user()
+    if not active_user:
+        return not_authenticated_error()
 
     duplicate = dal.get_category_by_name(cat_name)
     if duplicate:
@@ -162,18 +162,25 @@ def categoryCreate(cat_name):
 
 @app.route('/catalog/<cat_name>/delete/', methods=['GET'])
 def categoryDeleteForm(cat_name):
-    return render("cat_delete_form.html", cat_name=cat_name)
+    state = generate_nonce()
+    return render("cat_delete_form.html", cat_name=cat_name, state=state)
 
 @app.route('/catalog/<cat_name>/delete/', methods=['POST'])
 def categoryDelete(cat_name):
+    state = request.values.get('state')
+    if not check_nonce(state):
+        return bad_credentials_error()
+
     cat = dal.get_category_by_name(cat_name)
     if not cat:
         return not_found_error()
+
     active_user = get_active_user()
     if not active_user:
         return not_authenticated_error()
     if active_user.user_id != cat.creator_id:
         return not_authorized_error()
+
     dal.delete_category(cat.cat_id)
     return render("cat_delete_success.html", cat_name=cat_name)
 
