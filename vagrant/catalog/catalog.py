@@ -36,6 +36,7 @@ from handler_utils import (
     create_err_response,
     create_json_response,
     already_exists_error,
+    bad_credentials_error,
     not_authenticated_error,
     not_authorized_error,
     not_found_error,
@@ -134,16 +135,24 @@ def categoryNameLookup(cat_name):
 
 @app.route('/catalog/<cat_name>/create/', methods=['GET'])
 def categoryCreateForm(cat_name):
-    return render("cat_create_form.html", cat_name=cat_name)
+    state = generate_nonce()
+    return render("cat_create_form.html", cat_name=cat_name, state=state)
 
 @app.route('/catalog/<cat_name>/create/', methods=['POST'])
 def categoryCreate(cat_name):
     active_user = get_active_user()
     if not active_user:
         return not_authenticated_error()
+
+    state = request.values.get('state')
+    if not check_nonce(state):
+        return bad_credentials_error()
+
     duplicate = dal.get_category_by_name(cat_name)
     if duplicate:
         return already_exists_error()
+
+    # All checks passed, create the category and show the success page
     cat_id = dal.create_category(cat_name, active_user.user_id)
     return render("cat_create_success.html",
         cat_name=cat_name,
@@ -249,8 +258,6 @@ def showLogin():
     """ Creates a nonce and displays the page listing available login options. """
     state = generate_nonce()
     return render("login.html", STATE=state)
-
-
 
 @app.route('/gconnect', methods=["POST"])
 def gconnect():
