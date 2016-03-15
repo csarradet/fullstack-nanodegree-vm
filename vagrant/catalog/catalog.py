@@ -245,21 +245,32 @@ def itemCreate(cat_name, item_name):
 
 @app.route('/catalog/<cat_name>/<item_name>/delete/', methods=['GET'])
 def itemDeleteForm(cat_name, item_name):
-    return render("item_delete_form.html", cat_name=cat_name, item_name=item_name)
+    state = generate_nonce()
+    return render("item_delete_form.html",
+        cat_name=cat_name, item_name=item_name, state=state)
 
 @app.route('/catalog/<cat_name>/<item_name>/delete/', methods=['POST'])
 def itemDelete(cat_name, item_name):
+    state = request.values.get('state')
+    if not check_nonce(state):
+        return bad_credentials_error()
+
     cat = dal.get_category_by_name(cat_name)
     if not cat:
         return not_found_error()
+
     active_user = get_active_user()
     if not active_user:
         return not_authenticated_error()
+
     item = dal.get_item_by_name(cat.cat_id, item_name)
     if not item:
         return not_found_error()
+
     if active_user.user_id != item.creator_id:
         return not_authorized_error()
+
+    # All checks passed, delete the item and show the success page
     dal.delete_item(item.item_id)
     return render("item_delete_success.html", cat_name=cat_name, item_name=item_name)
 

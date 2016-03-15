@@ -5,6 +5,7 @@
 Delete the item named {{ cat_name }}/{{ item_name }}?
 
 <form method="POST">
+    <input type="hidden" name="state" value="{{ state }}" />
     <input type="submit" value="Confirm" />
 </form>
 
