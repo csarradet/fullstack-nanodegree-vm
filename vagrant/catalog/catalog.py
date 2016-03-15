@@ -14,6 +14,7 @@ from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import httplib2
 import imghdr
+import base64
 import json
 import requests
 from werkzeug import secure_filename
@@ -189,12 +190,12 @@ def categoryDelete(cat_name):
 
 
 
-@app.route('/item-list/')
+@app.route('/catalog/item-list/')
 def itemList():
     item_list = dal.get_items()
     return render("item_list.html", items=item_list)
 
-@app.route('/item-list/<int:count>/')
+@app.route('/catalog/item-list/<int:count>/')
 def recentItems(count):
     item_list = dal.get_recent_items(count)
     return render("item_list.html", items=item_list)
@@ -207,8 +208,15 @@ def itemListByCategory(cat_name):
     item_list = dal.get_items_by_cat(cat.cat_id)
     return render("item_list.html", items=item_list)
 
+@app.route('/catalog/item-by-id/<item_id>/')
+def itemLookupById(item_id):
+    item = dal.get_item(item_id)
+    if not item:
+        return not_found_error()
+    return render("item_list.html", items=[item])
+
 @app.route('/catalog/<cat_name>/<item_name>/')
-def itemLookup(cat_name, item_name):
+def itemLookupByName(cat_name, item_name):
     cat = dal.get_category_by_name(cat_name)
     if not cat:
         return not_found_error()
@@ -245,14 +253,14 @@ def itemCreate(cat_name, item_name):
     if duplicate:
         return already_exists_error()
 
-    # Picture validation uses code from http://flask.pocoo.org/docs/0.10/patterns/fileuploads/
-    pic = request.files["picture"]
-    if not validate_picture(pic):
+    pic_data = validate_picture(request.files["picture"])
+    if not pic_data:
         return bad_request_error()
 
     # All checks passed, create the item and show the success page
     desc = request.values.get("description")
-    item_id = dal.create_item(item_name, cat.cat_id, active_user.user_id, desc)
+    item_id = dal.create_item(
+        item_name, cat.cat_id, active_user.user_id, pic_data, desc)
     if not item_id:
         return internal_error()
     return render("item_create_success.html",
@@ -260,17 +268,16 @@ def itemCreate(cat_name, item_name):
         item_name=item_name,
         item_id=item_id,
         desc=desc,
+        pic_data=pic_data
         )
 
 def validate_picture(pic):
     """
-    Side effect: changes pic.filename to its secure_filename() equivalent.
-    Returns true if pic is a valid picture file that can be safely committed to the DB,
-        OR if it's falsy (and will be replaced by a null/placeholder).
-    """
-    if not pic:
-        return True
+    Uses code from http://flask.pocoo.org/docs/0.10/patterns/fileuploads/
 
+    If pic is a valid picture file that can safely be stored in the db,
+    return its base64-encoded binary contents.
+    """
     pic.filename = secure_filename(pic.filename)
     if not pic.filename.endswith(".jpg"):
         logging.error("Picture validation failed: invalid extension")
@@ -285,7 +292,7 @@ def validate_picture(pic):
         return False
 
     # All checks passed
-    return True
+    return base64.b64encode(content)
 
 
 

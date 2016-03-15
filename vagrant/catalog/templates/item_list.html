@@ -12,6 +12,7 @@
         <td>Creator ID</td>
         <td>Creator Name</td>
         <td>Date Changed</td>
+        <td>Picture</td>
     </tr>
     {% for i in items %}
     <tr>
@@ -23,6 +24,7 @@
         <td>{{ i.creator_id }}</td>
         <td>{{ i.creator_name }}</td>
         <td>{{ i.changed }}</td>
+        <td><img src="data:image/jpeg;base64,{{ i.pic }}" /></td>
     </tr>
     {% endfor %}
     </table>
