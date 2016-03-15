@@ -50,11 +50,13 @@
                 {% set cat_count = 0 %}
                 {% for cat in items_by_cat %}
                 {% set cat_count = cat_count + 1 %}
+                {% set items_len = cat[1]|length %}
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <div class="panel-title">
                             <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ cat_count }}">
-                                {{ cat[0] }}
+                                <span>{{ cat[0] }}</span>
+                                <span class="badge pull-right">{{ items_len }}</span>
                             </a>
                         </div>
                     </div>
