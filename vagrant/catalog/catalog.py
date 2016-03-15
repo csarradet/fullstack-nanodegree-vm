@@ -124,7 +124,7 @@ def userLookup(user_id):
 
 
 
-@app.route('/category-list/')
+@app.route('/catalog/category-list/')
 def categoryList():
     cat_list = dal.get_categories()
     return render("cat_list.html", categories=cat_list)
@@ -190,6 +190,11 @@ def categoryDelete(cat_name):
     return render("cat_delete_success.html", cat_name=cat_name)
 
 
+
+@app.route('/catalog/item-list-by-cat/')
+def itemListByCat():
+    grouped_items = dal.list_items_by_cat()
+    return render("text_dump.html", content=grouped_items)
 
 @app.route('/catalog/item-list/')
 def itemList():

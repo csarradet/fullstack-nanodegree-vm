@@ -1,7 +1,7 @@
 """
 This file houses our data abstraction layer.  It insulates the rest
 of the application code from whichever database we happen to be
-using (sqlite3, in this case).
+using (sqlite3, in this case) and handles things like caching.
 
 Note that while the __simple_xxx functions use unsafe string
 concatenation for table and column names, they're only intended
@@ -25,6 +25,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from entities import AuthSource, User, Category, Item
+
 
 
 @contextlib.contextmanager
@@ -225,6 +226,24 @@ def get_recent_items(count):
         result = cursor.fetchall()
     for row in result:
         output.append(entity_from_row(Item, row))
+    return output
+
+def list_items_by_cat():
+    """
+    Returns a list of sorted tuples:
+        Item 0: The name of a category
+        Item 1: An array containing the names of all
+        items in that category
+    This is used to build the dashboard sidebar; in production, a
+    caching solution or AJAX would be tacked on for performance reasons.
+    """
+    output = []
+    for cat in get_categories():
+        items = get_items_by_cat(cat.cat_id)
+        item_names = [x.name for x in items]
+        item_names.sort()
+        output.append((cat.name, item_names))
+    output.sort()
     return output
 
 
