@@ -41,12 +41,12 @@
     </nav>
 
     <!-- bootstrap layout container (everything below the navbar) -->
-    <div class="container">
+    <div class="container-fluid">
         <div class="row">
 
             <!-- body panel 1: left sidebar -->
             <!-- Uses sample code from http://www.w3schools.com/bootstrap/bootstrap_collapse.asp -->
-            <div id="accordion" class="col-xs-2 panel-group">
+            <div id="accordion" class="col-sm-2 panel-group">
                 {% set cat_count = 0 %}
                 {% for cat in items_by_cat %}
                 {% set cat_count = cat_count + 1 %}
@@ -70,7 +70,7 @@
             </div>
 
             <!-- body panel 2: right content pane -->
-            <div id="content" class="col-xs-8">
+            <div id="content" class="col-sm-8">
                 {% block content %}{% endblock %}
             </div>
         </div>
