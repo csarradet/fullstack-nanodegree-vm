@@ -139,8 +139,7 @@ def categoryNameLookup(cat_name):
 
 @app.route('/catalog/<cat_name>/create/', methods=['GET'])
 def categoryCreateForm(cat_name):
-    state = generate_nonce()
-    return render("cat_create_form.html", cat_name=cat_name, state=state)
+    return render("cat_create_form.html", cat_name=cat_name)
 
 @app.route('/catalog/<cat_name>/create/', methods=['POST'])
 def categoryCreate(cat_name):
@@ -157,6 +156,7 @@ def categoryCreate(cat_name):
         return already_exists_error()
 
     # All checks passed, create the category and show the success page
+    generate_nonce()
     cat_id = dal.create_category(cat_name, active_user.user_id)
     return render("cat_create_success.html",
         cat_name=cat_name,
@@ -166,8 +166,7 @@ def categoryCreate(cat_name):
 
 @app.route('/catalog/<cat_name>/delete/', methods=['GET'])
 def categoryDeleteForm(cat_name):
-    state = generate_nonce()
-    return render("cat_delete_form.html", cat_name=cat_name, state=state)
+    return render("cat_delete_form.html", cat_name=cat_name)
 
 @app.route('/catalog/<cat_name>/delete/', methods=['POST'])
 def categoryDelete(cat_name):
@@ -186,6 +185,7 @@ def categoryDelete(cat_name):
         return not_authorized_error()
 
     # All checks passed, delete the category and show the success page
+    generate_nonce()
     dal.delete_category(cat.cat_id)
     return render("cat_delete_success.html", cat_name=cat_name)
 
@@ -237,9 +237,8 @@ def itemLookupByName(cat_name, item_name):
 
 @app.route('/catalog/<cat_name>/<item_name>/create/', methods=['GET'])
 def itemCreateForm(cat_name, item_name):
-    state = generate_nonce()
     return render("item_create_form.html",
-        cat_name=cat_name, item_name=item_name, state=state)
+        cat_name=cat_name, item_name=item_name)
 
 @app.route('/catalog/<cat_name>/<item_name>/create/', methods=['POST'])
 def itemCreate(cat_name, item_name):
@@ -264,6 +263,7 @@ def itemCreate(cat_name, item_name):
         return bad_request_error()
 
     # All checks passed, create the item and show the success page
+    generate_nonce()
     desc = bleach.clean(request.values.get("description"))
     item_id = dal.create_item(
         item_name, cat.cat_id, active_user.user_id, pic_data, desc)
@@ -310,9 +310,8 @@ def validate_picture(pic):
 
 @app.route('/catalog/<cat_name>/<item_name>/delete/', methods=['GET'])
 def itemDeleteForm(cat_name, item_name):
-    state = generate_nonce()
     return render("item_delete_form.html",
-        cat_name=cat_name, item_name=item_name, state=state)
+        cat_name=cat_name, item_name=item_name)
 
 @app.route('/catalog/<cat_name>/<item_name>/delete/', methods=['POST'])
 def itemDelete(cat_name, item_name):
@@ -336,6 +335,7 @@ def itemDelete(cat_name, item_name):
         return not_authorized_error()
 
     # All checks passed, delete the item and show the success page
+    generate_nonce()
     dal.delete_item(item.item_id)
     return render("item_delete_success.html", cat_name=cat_name, item_name=item_name)
 

@@ -17,6 +17,7 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 
 from dal import list_items_by_cat
+from session_utils import get_current_nonce
 
 def jdefault(o):
     """
@@ -86,4 +87,5 @@ def render(filename, **kwargs):
     """
     kwargs["current_user"] = get_active_user()
     kwargs["items_by_cat"] = list_items_by_cat()
+    kwargs["state"] = get_current_nonce()
     return render_template(filename, **kwargs)

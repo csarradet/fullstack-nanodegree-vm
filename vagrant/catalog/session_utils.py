@@ -40,13 +40,22 @@ def generate_nonce():
     session[SessionKeys.STATE] = state
     return state
 
+def get_current_nonce():
+    """
+    Returns the current state, generating a new one only if it's empty
+    """
+    try:
+        return session[SessionKeys.STATE]
+    except KeyError:
+        return generate_nonce()
+
 def check_nonce(provided):
     """
     Returns True if the provided nonce matches the one stored in our session,
     returns False otherwise.
     """
     try:
-        saved = session[SessionKeys.STATE]
+        saved = get_current_nonce()
         if not saved:
             logging.error("Nonce check failed, existing nonce is empty: {}".format(saved))
             return False
@@ -56,7 +65,7 @@ def check_nonce(provided):
             logging.error("Nonce mismatch\nSaved: {}, provided: {}".format(
                 saved, provided))
             return False
-    except IndexError:
+    except KeyError:
         logging.error("Nonce check failed, no existing nonce in session")
         return False
 
