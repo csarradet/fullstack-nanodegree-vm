@@ -1,17 +1,67 @@
 <html>
 <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />    
     <title>{% block title %}Catalogifier{% endblock %}</title>
+
+    <!-- Bootstrap includes -->
+    <!-- Hosted JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <!-- Customized Bootstrap css with United theme -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
     {% block head %}{% endblock %}
 </head>
 <body>
-    {% if current_user is none %}
-    <h1>Not logged in</h1>
-    {% else %}
-    <h1>Logged in as {{ current_user.username }}</h1>
-    {% endif %}
+    <!-- bootstrap navbar -->
+    <nav id="header" class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">$> Catalogifier</a>
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    {% if current_user is none %}
+                    <a href="/login">Log in</a>
+                    {% else %}
+                    <li><a href="/logout">{{ current_user.username }}</a></li>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+    </nav>
 
-    {% block content %}
-    {% endblock %}
+    <!-- bootstrap layout container (everything below the navbar) -->
+    <div class="container">
+        <div class="row">
+            <!-- body panel 1: left sidebar -->
+            <div id="sidebar" class="col-md-2">
+                (Sidebar stuff)
+
+
+            </div>
+            <!-- body panel 2: right content pane -->
+            <div id="content" class="col-md-10">{% block content %}{% endblock %}</div>
+        </div>
+    </div> <!-- /container -->
+
+
+
+
+
+
+
+
+
 </body>
 </html>
 
