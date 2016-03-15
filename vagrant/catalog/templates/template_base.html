@@ -22,7 +22,7 @@
     {% block head %}{% endblock %}
 </head>
 <body>
-    <!-- bootstrap flyout modals for creating items/categories -->
+    <!-- bootstrap flyout modal for creating categories -->
     <!-- uses code from http://getbootstrap.com/javascript/#modals -->
     <div class="modal fade" id="cat_create_modal" tabindex="-1" role="dialog">
         <div class="modal-dialog">
@@ -45,6 +45,32 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+
+    <!-- bootstrap flyout modal for creating items -->
+    <!-- uses code from http://getbootstrap.com/javascript/#modals -->
+    <div class="modal fade" id="item_create_modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Create New Item</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="/catalog/create/">
+                        <input type="text" name="state" value="{{ state }}"></input><br />
+                        
+                        <label for="item_create_name">Name:</label>
+                        <input type="text" id="cat_create_name" name="cat_create_name"></input><br />
+                        
+                        <input type="submit">Confirm</input>
+
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
 
     <!-- bootstrap navbar -->
     <nav id="header" class="navbar navbar-default">
