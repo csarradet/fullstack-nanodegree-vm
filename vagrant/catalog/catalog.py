@@ -68,8 +68,8 @@ def download_static_file(filename):
 @app.route('/')
 def helloWorld():
     """ Serves the splash page for the application. """
-    # TODO
-    return render("dashboard.html")
+    recent_items = dal.get_recent_items(5)
+    return render("dashboard.html", recent_items=recent_items)
 
 
 

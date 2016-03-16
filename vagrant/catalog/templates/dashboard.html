@@ -2,6 +2,14 @@
 
 {% block content %}
 
-Hello world
+<h3>Recent changes:</h3>
+<ul>
+    {% for item in recent_items %}
+    <li><a href="/catalog/{{ item.cat_name }}/{{ item.name }}/">{{ item.cat_name }}\{{ item.name }}</a>
+        updated by <a href="mailto:{{ item.creator_name }}">{{ item.creator_name }}</a>
+        on {{ item.changed }}</li>
+    {% endfor %}
+</ul>
+
 
 {% endblock %}
