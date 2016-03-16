@@ -21,10 +21,6 @@
 
 
     <script>
-    function reset_parent_list(new_list){
-        // Replaces the dropdown list of categories on the item creation modal
-    }
-
     function set_parent(new_name){
         // Updates the value of the parent category on the item creation modal
         $('#item_create_parent').val(new_name);
@@ -50,7 +46,7 @@
                         <label for="cat_create_name">Name:</label>
                         <input type="text" id="cat_create_name" name="cat_create_name"></input><br />
 
-                        <input type="submit" value="Confirm" />
+                        <input type="submit" value="Confirm" class="button btn-primary"/>
 
                     </form>
                 </div>
@@ -76,12 +72,16 @@
                         <input type="text" id="item_create_name" name="item_create_name"></input><br />
 
                         <label for="item_create_parent">Category:</label>
-                        <input type="text" id="item_create_parent" name="item_create_parent" value=""></input><br />
+                        <select name="item_create_parent" id="item_create_parent">
+                            {% for cat in items_by_cat %}
+                            <option value="{{ cat[0] }}">{{ cat[0] }}</option>
+                            {% endfor %}
+                        </select><br />
 
                         <label for="item_create_pic">Picture (.jpg only):</label>
-                        <input type="file" name="item_create_pic" accept=".jpg" /><br />
+                        <input type="file" name="item_create_pic" accept=".jpg" class="button btn-default"/><br />
 
-                        <input type="submit" value="Confirm" />
+                        <input type="submit" value="Confirm" class="button btn-primary" />
 
                     </form>
                 </div>
