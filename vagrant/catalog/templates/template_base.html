@@ -19,6 +19,18 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
+
+    <script>
+    function reset_parent_list(new_list){
+        // Replaces the dropdown list of categories on the item creation modal
+    }
+
+    function set_parent(new_name){
+        // Updates the value of the parent category on the item creation modal
+        $('#item_create_parent').val(new_name);
+    }
+    </script>
+
     {% block head %}{% endblock %}
 </head>
 <body>
@@ -32,19 +44,20 @@
                     <h4 class="modal-title">Create New Category</h4>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" action="/catalog/create/">
+                    <form method="POST" action="/catalog/create-cat/">
                         <input type="text" name="state" value="{{ state }}"></input><br />
 
                         <label for="cat_create_name">Name:</label>
                         <input type="text" id="cat_create_name" name="cat_create_name"></input><br />
 
-                        <input type="submit">Confirm</input>
+                        <input type="submit" value="Confirm" />
 
                     </form>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+
 
     <!-- bootstrap flyout modal for creating items -->
     <!-- uses code from http://getbootstrap.com/javascript/#modals -->
@@ -56,13 +69,19 @@
                     <h4 class="modal-title">Create New Item</h4>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" action="/catalog/create/">
+                    <form method="POST" action="/catalog/create-item/" enctype="multipart/form-data">
                         <input type="text" name="state" value="{{ state }}"></input><br />
 
                         <label for="item_create_name">Name:</label>
-                        <input type="text" id="cat_create_name" name="cat_create_name"></input><br />
+                        <input type="text" id="item_create_name" name="item_create_name"></input><br />
 
-                        <input type="submit">Confirm</input>
+                        <label for="item_create_parent">Category:</label>
+                        <input type="text" id="item_create_parent" name="item_create_parent" value=""></input><br />
+
+                        <label for="item_create_pic">Picture (.jpg only):</label>
+                        <input type="file" name="item_create_pic" accept=".jpg" /><br />
+
+                        <input type="submit" value="Confirm" />
 
                     </form>
                 </div>
@@ -117,17 +136,17 @@
                         </div>
                         {% endfor %}
 
-                        <!-- only authenticated users can create new entries -->
+                        <!-- only authenticated users can create new items -->
                         {% if current_user is not none %}
                         <div class="list-group-item">
-                            <a href="#">(add new item)</a>
+                            <a data-toggle="modal" data-target="#item_create_modal" href="#" onclick="set_parent('{{ cat[0] }}')">(add new item)</a>
                         </div>
                         {% endif %}
                     </div>
                 </div>
                 {% endfor %}
 
-                <!-- only authenticated users can create new entries -->
+                <!-- only authenticated users can create new categories -->
                 {% if current_user is not none %}
                 <div class="panel panel-primary">
                     <div class="panel-heading">

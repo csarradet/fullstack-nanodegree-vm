@@ -137,7 +137,7 @@ def categoryNameLookup(cat_name):
     return render("cat_list.html", categories=cat)
 
 
-@app.route('/catalog/create/', methods=['POST'])
+@app.route('/catalog/create-cat/', methods=['POST'])
 def categoryCreate():
     state = request.values.get('state')
     if not check_nonce(state):
@@ -232,17 +232,13 @@ def itemLookupByName(cat_name, item_name):
     return render("item_list.html", items=[item], active_cat=cat_name)
 
 
-@app.route('/catalog/<cat_name>/<item_name>/create/', methods=['GET'])
-def itemCreateForm(cat_name, item_name):
-    return render("item_create_form.html",
-        cat_name=cat_name, item_name=item_name)
-
-@app.route('/catalog/<cat_name>/<item_name>/create/', methods=['POST'])
-def itemCreate(cat_name, item_name):
+@app.route('/catalog/create-item/', methods=['POST'])
+def itemCreate():
     state = request.values.get('state')
     if not check_nonce(state):
         return bad_request_error()
 
+    cat_name = bleach.clean(request.values.get("item_create_parent"))
     cat = dal.get_category_by_name(cat_name)
     if not cat:
         return not_found_error()
@@ -251,11 +247,12 @@ def itemCreate(cat_name, item_name):
     if not active_user:
         return not_authenticated_error()
 
+    item_name = bleach.clean(request.values.get("item_create_name"))
     duplicate = dal.get_item_by_name(cat.cat_id, item_name)
     if duplicate:
         return already_exists_error()
 
-    pic_data = validate_picture(request.files["picture"])
+    pic_data = validate_picture(request.files["item_create_pic"])
     if not pic_data:
         return bad_request_error()
 
