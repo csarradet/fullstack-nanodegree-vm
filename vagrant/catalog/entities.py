@@ -9,12 +9,16 @@ being serialized, or sent back and forth from the DAL).
 
 import json
 
+def jdefault(o):
+    # Special case for encoding item.pic
+    if isinstance(o, buffer):
+        return str(o)
+    return o.__dict__
 
 class AuthSource(object):
     """ Enum listing all authentication sources we currently support. """
     DUMMY = "fake_auth_source"
     GOOGLE_PLUS = "google_plus"
-    FACEBOOK = "facebook"
 
 
 class Entity(object):
@@ -25,12 +29,12 @@ class Entity(object):
         """
         Reconstructs an Entity instance from a dict.  Useful when deserializing.
         Uses code from:
-        http://stackoverflow.com/questions/1305532/convert-python-dict-to-object
+        http://stackoverflow.com/questions/3768895/python-how-to-make-a-class-json-serializable
         """
         self.__dict__.update(entries)
 
     def to_json(self):
-        return json.dumps(self.__dict__)
+        return json.dumps(self, default=jdefault)
 
 
 class User(Entity):

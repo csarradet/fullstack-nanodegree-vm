@@ -17,14 +17,10 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 
 from dal import list_items_by_cat
+from entities import Entity
 from session_utils import get_current_nonce
 
-def jdefault(o):
-    """
-    Default JSON encoder for using complex objects with json.dumps.
-    Uses code from http://pythontips.com/2013/08/08/storing-and-loading-data-with-json/
-    """
-    return o.__dict__
+
 
 def date_to_atom_friendly(date):
     """

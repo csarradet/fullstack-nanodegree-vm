@@ -31,9 +31,8 @@ CLIENT_ID = json.loads(
     open("client_secrets.json", "r").read())["web"]["client_id"]
 
 import dal
-from entities import AuthSource
+from entities import AuthSource, Entity
 from handler_utils import (
-    jdefault,
     date_to_atom_friendly,
     render,
     create_atom_response,
@@ -73,6 +72,15 @@ def helloWorld():
 
 
 
+
+
+def jdefault(o):
+    # JSON encoder used to handle entity conversions
+    if isinstance(o, buffer):
+        # Special case for encoding binary picture data on items:
+        return str(o)
+    return o.__dict__
+
 @app.route('/catalog.json')
 def jsonEndpoint():
     """ Dumps all categories and items to JSON format """
@@ -86,10 +94,9 @@ def jsonEndpoint():
     for j in items:
         cat_dict[j.cat_id].items.append(j)
 
-    output = [x for x in cat_dict.values()]
-    json_output = json.dumps(output, default=jdefault, indent=4)
+    output = json.dumps(cat_dict.values(), default=jdefault)
+    return create_json_response(output)
 
-    return create_json_response(json_output)
 
 @app.route('/catalog.atom')
 def atomEndpoint():
