@@ -79,7 +79,7 @@ def set_active_user(user):
 def get_active_user():
     """
     Inspects the session data to look up the currently logged in user.
-    Returns None if no one is logged in.
+    Returns a User instance if someone is logged in, or None otherwise.
     """
     try:
         user_dict = load_from_session(SessionKeys.CURRENT_USER)

@@ -110,7 +110,7 @@ def atomEndpoint():
 
 
 
-@app.route('/user-list')
+@app.route('/user-list/')
 def userList():
     user_list = dal.get_users()
     return render("user_list.html", users=user_list)
