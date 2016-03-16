@@ -42,9 +42,15 @@
     function set_current_cat(cat_name){
         // Updates all flyout modals to show the provided cat_name when opened
         $('#item_create_parent').val(cat_name);
+        $('#item_delete_parent').val(cat_name);
         $('#cat_delete_name').val(cat_name);
     }
 
+    function set_cat_and_item(cat_name, item_name){
+        // Updates all flyout modals to show the provided cat_name and item_name
+        set_current_cat(cat_name);
+        $('#item_delete_name').val(item_name)
+    }
     </script>
 
 
@@ -75,6 +81,7 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+
 
     <!-- bootstrap flyout modal for deleting categories -->
     <div class="modal fade" id="cat_delete_modal" tabindex="-1" role="dialog">
@@ -137,7 +144,37 @@
     </div><!-- /.modal -->
 
 
+    <!-- bootstrap flyout modal for deleting items -->
+    <div class="modal fade" id="item_delete_modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Delete Item</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="/catalog/delete-item/">
+                        <input type="hidden" name="state" value="{{ state }}"></input><br />
+                        <div>Are you sure you want to delete the following item?</div>
 
+                        <label for="item_delete_name">Name:</label>
+                        <input type="text" id="item_delete_name" name="item_delete_name" readonly></input><br />
+
+                        <label for="item_delete_parent">Category:</label>
+                        <input type="text" id="item_delete_parent" name="item_delete_parent" readonly></input><br />
+
+                        <br />
+                        <input type="submit" value="Confirm" class="button btn-primary" />
+
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+
+    <!-- Start of visible page content -->
     <!-- bootstrap navbar -->
     <nav id="header" class="navbar navbar-default">
         <div class="container-fluid">
@@ -215,7 +252,9 @@
                                     </a>
                                     <ul class="dropdown-menu text-primary list-inline">
                                         <li>Edit</li>
-                                        <li>Delete</li>
+                                        <li>
+                                            <a data-toggle="modal" data-target="#item_delete_modal" href="#" onclick="set_cat_and_item('{{ cat_name }}','{{ item_name }}')">Delete</a>
+                                        </li>
                                     </ul>
                                 </span>
                                 {% endif %}

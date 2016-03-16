@@ -291,17 +291,13 @@ def validate_picture(pic):
 
 
 
-@app.route('/catalog/<cat_name>/<item_name>/delete/', methods=['GET'])
-def itemDeleteForm(cat_name, item_name):
-    return render("item_delete_form.html",
-        cat_name=cat_name, item_name=item_name)
-
-@app.route('/catalog/<cat_name>/<item_name>/delete/', methods=['POST'])
-def itemDelete(cat_name, item_name):
+@app.route('/catalog/delete-item/', methods=['POST'])
+def itemDelete():
     state = request.values.get('state')
     if not check_nonce(state):
         return bad_request_error()
 
+    cat_name = bleach.clean(request.values.get("item_delete_parent"))
     cat = dal.get_category_by_name(cat_name)
     if not cat:
         return not_found_error()
@@ -310,6 +306,7 @@ def itemDelete(cat_name, item_name):
     if not active_user:
         return not_authenticated_error()
 
+    item_name = bleach.clean(request.values.get("item_delete_name"))
     item = dal.get_item_by_name(cat.cat_id, item_name)
     if not item:
         return not_found_error()
@@ -320,7 +317,7 @@ def itemDelete(cat_name, item_name):
     # All checks passed, delete the item and show the success page
     generate_nonce()
     dal.delete_item(item.item_id)
-    return render("item_delete_success.html", cat_name=cat_name, item_name=item_name)
+    return redirect("/")
 
 
 
