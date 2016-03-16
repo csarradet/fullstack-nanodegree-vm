@@ -41,7 +41,7 @@
                 </div>
                 <div class="modal-body">
                     <form method="POST" action="/catalog/create-cat/">
-                        <input type="text" name="state" value="{{ state }}"></input><br />
+                        <input type="hidden" name="state" value="{{ state }}"></input><br />
 
                         <label for="cat_create_name">Name:</label>
                         <input type="text" id="cat_create_name" name="cat_create_name"></input><br />
@@ -67,7 +67,7 @@
                 </div>
                 <div class="modal-body">
                     <form method="POST" action="/catalog/create-item/" enctype="multipart/form-data">
-                        <input type="text" name="state" value="{{ state }}"></input><br />
+                        <input type="hidden" name="state" value="{{ state }}"></input><br />
 
                         <label for="item_create_name">Name:</label>
                         <input type="text" id="item_create_name" name="item_create_name"></input><br />
