@@ -39,10 +39,12 @@
     </style>
 
     <script>
-    function set_parent(new_name){
-        // Updates the value of the parent category on the item creation modal
-        $('#item_create_parent').val(new_name);
+    function set_current_cat(cat_name){
+        // Updates all flyout modals to show the provided cat_name when opened
+        $('#item_create_parent').val(cat_name);
+        $('#cat_delete_name').val(cat_name);
     }
+
     </script>
 
 
@@ -74,9 +76,33 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
+    <!-- bootstrap flyout modal for deleting categories -->
+    <div class="modal fade" id="cat_delete_modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Delete Category</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="/catalog/delete-cat/">
+                        <input type="hidden" name="state" value="{{ state }}"></input><br />
+                        <div>Are you sure you want to delete the following category?</div>
+
+                        <label for="cat_delete_name">Name:</label>
+                        <input type="text" id="cat_delete_name" name="cat_delete_name" readonly></input><br />
+
+                        <br />
+                        <input type="submit" value="Confirm" class="button btn-primary" />
+
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
 
     <!-- bootstrap flyout modal for creating items -->
-    <!-- uses code from http://getbootstrap.com/javascript/#modals -->
     <div class="modal fade" id="item_create_modal" tabindex="-1" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -160,7 +186,9 @@
                                         </a>
                                         <ul class="dropdown-menu text-primary list-inline">
                                             <li>Edit</li>
-                                            <li>Delete</li>
+                                            <li>
+                                                <a data-toggle="modal" data-target="#cat_delete_modal" href="#" onclick="set_current_cat('{{ cat_name }}')">Delete</a>
+                                            </li>
                                         </ul>
                                     </span>
                                     {% endif %}
@@ -198,7 +226,7 @@
                         <!-- only authenticated users can create new items -->
                         {% if current_user is not none %}
                         <div class="list-group-item">
-                            <a data-toggle="modal" data-target="#item_create_modal" href="#" onclick="set_parent('{{ cat_name }}')">(add new item)</a>
+                            <a data-toggle="modal" data-target="#item_create_modal" href="#" onclick="set_current_cat('{{ cat_name }}')">(add new item)</a>
                         </div>
                         {% endif %}
                     </div>

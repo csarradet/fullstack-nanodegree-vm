@@ -155,22 +155,17 @@ def categoryCreate():
     # All checks passed, create the category and show the success page
     generate_nonce()
     cat_id = dal.create_category(cat_name, active_user.user_id)
-    return render("cat_create_success.html",
-        cat_name=cat_name,
-        cat_id=cat_id,
-        owner_name=active_user.username)
+    return redirect("/")
 
 
-@app.route('/catalog/<cat_name>/delete/', methods=['GET'])
-def categoryDeleteForm(cat_name):
-    return render("cat_delete_form.html", cat_name=cat_name)
 
-@app.route('/catalog/<cat_name>/delete/', methods=['POST'])
-def categoryDelete(cat_name):
+@app.route('/catalog/delete-cat/', methods=['POST'])
+def categoryDelete():
     state = request.values.get('state')
     if not check_nonce(state):
         return bad_request_error()
 
+    cat_name = bleach.clean(request.values.get("cat_delete_name"))
     cat = dal.get_category_by_name(cat_name)
     if not cat:
         return not_found_error()
@@ -184,7 +179,7 @@ def categoryDelete(cat_name):
     # All checks passed, delete the category and show the success page
     generate_nonce()
     dal.delete_category(cat.cat_id)
-    return render("cat_delete_success.html", cat_name=cat_name)
+    return redirect("/")
 
 
 
@@ -269,13 +264,7 @@ def itemCreate():
         logging.error(
             "Unable to create item: an instance was not created for item_id {}".format(item_id))
         return internal_error()
-    return render("item_create_success.html",
-        cat_name=cat_name,
-        item_name=item_name,
-        item_id=item_id,
-        desc=desc,
-        pic_data=pic_data
-        )
+    return redirect("/catalog/{}/{}/".format(cat_name, item_name))
 
 def validate_picture(pic):
     """
