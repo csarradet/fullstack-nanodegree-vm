@@ -20,12 +20,31 @@
     <![endif]-->
 
 
+    <!-- "Unstyled" definitions from http://stackoverflow.com/questions/22429881/how-to-unstyle-anchor-when-using-bootstrap -->
+    <style>
+    .link-unstyled {
+      color: inherit;
+      text-decoration: inherit;
+    }
+
+    .link-unstyled:link {
+      color: inherit;
+      text-decoration: inherit;
+    }
+
+    .link-unstyled:hover {
+      color: inherit;
+      text-decoration: inherit;
+    }
+    </style>
+
     <script>
     function set_parent(new_name){
         // Updates the value of the parent category on the item creation modal
         $('#item_create_parent').val(new_name);
     }
     </script>
+
 
     {% block head %}{% endblock %}
 </head>
@@ -135,7 +154,15 @@
                                 <!-- does this user own the category?  add a toolbox -->
                                 {% if current_user is not none %}
                                     {% if current_user.user_id == cat_owner_id %}
-                                    <span class="glyphicon glyphicon-cog"></span>
+                                    <span class="dropdown">
+                                        <a class="dropdown-toggle link-unstyled" data-toggle="dropdown">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </a>
+                                        <ul class="dropdown-menu text-primary list-inline">
+                                            <li>Edit</li>
+                                            <li>Delete</li>
+                                        </ul>
+                                    </span>
                                     {% endif %}
                                 {% endif %}
 
@@ -154,7 +181,15 @@
                             <!-- does this user own the item?  add a toolbox -->
                             {% if current_user is not none %}
                                 {% if current_user.user_id == item_owner_id %}
-                                <span class="glyphicon glyphicon-cog pull-right"></span>
+                                <span class="dropdown">
+                                    <a class="dropdown-toggle link-unstyled" data-toggle="dropdown">
+                                        <span class="glyphicon glyphicon-cog"></span>
+                                    </a>
+                                    <ul class="dropdown-menu text-primary list-inline">
+                                        <li>Edit</li>
+                                        <li>Delete</li>
+                                    </ul>
+                                </span>
                                 {% endif %}
                             {% endif %}
                         </div>
