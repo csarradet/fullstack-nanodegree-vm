@@ -141,7 +141,7 @@
                     </div>
                     <div id="collapse{{ cat_count }}" class="panel-collapse collapse{% if active_cat == cat_name %} in{% endif %}">
                         {% for item in item_list %}
-                        <div class="list-group-item">
+                        <div class="list-group-item{% if active_item == item %} list-group-item-success{% endif %}">
                             <a href="/catalog/{{ cat_name }}/{{ item }}">{{ item }}</a>
                         </div>
                         {% endfor %}

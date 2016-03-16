@@ -231,9 +231,8 @@ def get_recent_items(count):
 def list_items_by_cat():
     """
     Returns a list of sorted tuples:
-        Item 0: The name of a category
-        Item 1: An array containing the names of all
-        items in that category
+        Item 0: A category instance
+        Item 1: An array containing the names of all items in that category
     This is used to build the dashboard sidebar; in production, a
     caching solution or AJAX would be tacked on for performance reasons.
     """
