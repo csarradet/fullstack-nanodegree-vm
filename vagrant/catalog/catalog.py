@@ -281,7 +281,7 @@ def itemCreate():
 
     # All checks passed
     generate_nonce()
-    desc = bleach.clean(request.values.get("description"))
+    desc = bleach.clean(request.values.get("item_create_description"))
     item_id = dal.create_item(
         item_name, cat.cat_id, active_user.user_id, pic_data, desc)
     if not item_id:

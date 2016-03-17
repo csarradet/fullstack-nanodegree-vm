@@ -28,6 +28,8 @@
         // Updates all flyout modals to show the provided cat_name when opened
         $('#item_create_parent').val(cat_name);
         $('#item_delete_parent').val(cat_name);
+        $('#item_update_old_parent').val(cat_name);
+        $('#item_update_new_parent').val(cat_name);
         $('#cat_delete_name').val(cat_name);
         $('#cat_update_old_name').val(cat_name)
     }
@@ -36,6 +38,8 @@
         // Updates all flyout modals to show the provided cat_name and item_name
         set_current_cat(cat_name);
         $('#item_delete_name').val(item_name)
+        $('#item_update_old_name').val(item_name)
+        $('#item_update_new_name').val(item_name)
     }
     </script>
 
@@ -53,7 +57,7 @@
                 </div>
                 <div class="modal-body">
                     <form method="POST" action="/catalog/create-cat/">
-                        <input type="hidden" name="state" value="{{ state }}"></input><br />
+                        <input type="hidden" name="state" value="{{ state }}"></input>
 
                         <label for="cat_create_name">Name:</label>
                         <input type="text" id="cat_create_name" name="cat_create_name"></input><br />
@@ -66,7 +70,6 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
-
     <!-- bootstrap flyout modal for deleting categories -->
     <div class="modal fade" id="cat_delete_modal" tabindex="-1" role="dialog">
         <div class="modal-dialog">
@@ -77,7 +80,7 @@
                 </div>
                 <div class="modal-body">
                     <form method="POST" action="/catalog/delete-cat/">
-                        <input type="hidden" name="state" value="{{ state }}"></input><br />
+                        <input type="hidden" name="state" value="{{ state }}"></input>
                         <div>Are you sure you want to delete the following category?</div>
 
                         <label for="cat_delete_name">Name:</label>
@@ -91,7 +94,6 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
-
     <!-- bootstrap flyout modal for updating categories -->
     <!-- uses code from http://getbootstrap.com/javascript/#modals -->
     <div class="modal fade" id="cat_update_modal" tabindex="-1" role="dialog">
@@ -99,14 +101,12 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Create New Category</h4>
+                    <h4 class="modal-title">Update Category</h4>
                 </div>
                 <div class="modal-body">
                     <form method="POST" action="/catalog/update-cat/">
-                        <input type="hidden" name="state" value="{{ state }}"></input><br />
-
-                        <label for="cat_update_old_name">Old name:</label>
-                        <input type="text" id="cat_update_old_name" name="cat_update_old_name" readonly></input><br />
+                        <input type="hidden" name="state" value="{{ state }}"></input>
+                        <input type="hidden" id="cat_update_old_name" name="cat_update_old_name"></input>
 
                         <label for="cat_update_new_name">New name:</label>
                         <input type="text" id="cat_update_new_name" name="cat_update_new_name"></input><br />
@@ -120,7 +120,6 @@
     </div><!-- /.modal -->
 
 
-
     <!-- bootstrap flyout modal for creating items -->
     <div class="modal fade" id="item_create_modal" tabindex="-1" role="dialog">
         <div class="modal-dialog">
@@ -131,13 +130,85 @@
                 </div>
                 <div class="modal-body">
                     <form method="POST" action="/catalog/create-item/" enctype="multipart/form-data">
-                        <input type="hidden" name="state" value="{{ state }}"></input><br />
+                        <input type="hidden" name="state" value="{{ state }}"></input>
 
                         <label for="item_create_name">Name:</label>
                         <input type="text" id="item_create_name" name="item_create_name"></input><br />
 
                         <label for="item_create_parent">Category:</label>
                         <select name="item_create_parent" id="item_create_parent">
+                            {% for cat in items_by_cat %}
+                            <option value="{{ cat[0].name }}">{{ cat[0].name }}</option>
+                            {% endfor %}
+                        </select><br />
+
+                        <br />
+                        <label for="item_create_pic">Picture (.jpg only):</label>
+                        <input type="file" name="item_create_pic" accept=".jpg"
+                            class="button btn-default" /><br />
+
+                        <label for="item_create_description">Description:</label>
+                        <input type="text" id="item_create_description" name="item_create_description"></input><br />                            
+
+                        <input type="submit" value="Confirm" class="button btn-primary" />
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <!-- bootstrap flyout modal for deleting items -->
+    <div class="modal fade" id="item_delete_modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Delete Item</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="/catalog/delete-item/">
+                        <input type="hidden" name="state" value="{{ state }}"></input>
+                        <div>Are you sure you want to delete the following item?</div>
+
+                        <label for="item_delete_name">Name:</label>
+                        <input type="text" id="item_delete_name" name="item_delete_name" readonly></input><br />
+
+                        <label for="item_delete_parent">Category:</label>
+                        <input type="text" id="item_delete_parent" name="item_delete_parent" readonly></input><br />
+
+                        <br />
+                        <input type="submit" value="Confirm" class="button btn-primary" />
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+
+
+
+
+
+    <!-- bootstrap flyout modal for updating items -->
+    <div class="modal fade" id="item_update_modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Update Item</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="/catalog/update-item/" enctype="multipart/form-data">
+                        <input type="hidden" name="state" value="{{ state }}"></input>
+                        <input type="hidden" id="item_update_old_name" name="item_update_old_name"></input>
+                        <input type="hidden" id="item_update_old_parent" name="item_update_old_parent"></input>
+
+                        <label for="item_update_new_name">New name:</label>
+                        <input type="text" id="item_update_new_name" name="item_update_new_name"></input><br />
+
+                        <label for="item_update_new_parent">Category:</label>
+                        <select name="item_update_new_parent" id="item_update_new_parent">
                             {% for cat in items_by_cat %}
                             <option value="{{ cat[0].name }}">{{ cat[0].name }}</option>
                             {% endfor %}
@@ -154,33 +225,6 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
-
-    <!-- bootstrap flyout modal for deleting items -->
-    <div class="modal fade" id="item_delete_modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Delete Item</h4>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" action="/catalog/delete-item/">
-                        <input type="hidden" name="state" value="{{ state }}"></input><br />
-                        <div>Are you sure you want to delete the following item?</div>
-
-                        <label for="item_delete_name">Name:</label>
-                        <input type="text" id="item_delete_name" name="item_delete_name" readonly></input><br />
-
-                        <label for="item_delete_parent">Category:</label>
-                        <input type="text" id="item_delete_parent" name="item_delete_parent" readonly></input><br />
-
-                        <br />
-                        <input type="submit" value="Confirm" class="button btn-primary" />
-                    </form>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
 
 
 
