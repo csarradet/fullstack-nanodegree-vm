@@ -188,6 +188,7 @@ def categoryDelete():
     return redirect("/")
 
 @app.route('/catalog/update-cat/', methods=['POST'])
+def categoryUpdate():
     state = request.values.get('state')
     if not check_nonce(state):
         return bad_request_error()
