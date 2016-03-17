@@ -34,7 +34,7 @@ CREATE TABLE items (
     item_id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT NOT NULL,
-    pic BLOB NOT NULL,
+    pic BLOB NOT NULL, #Binary JPEG data, base64 encoded
     cat_id INTEGER NOT NULL,
     creator_id INTEGER NOT NULL,
     changed DATETIME NOT NULL,
