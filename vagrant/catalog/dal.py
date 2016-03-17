@@ -8,14 +8,6 @@ concatenation for table and column names, they're only intended
 to be used from within this module and are always called with static values.
 All data originating from the user (things like names and ID numbers)
 are properly passed to the DB using parameterized queries.
-
-***
-The example classes for this project used SQLAlchemy's ORM solution --
-not to start a flame war, but I have some philosophical issues with
-ORM as a whole.
-Given the choice, I'd much rather have the database code under my
-control in its own module.
-***
 """
 
 import contextlib
@@ -180,7 +172,9 @@ def create_category(name, creator_id):
 def delete_category(cat_id):
     __simple_delete("categories", Category, "cat_id", cat_id)
 
-
+def update_category(cat_id, name):
+    with get_cursor() as cursor:
+        cursor.execute('UPDATE categories SET name=? WHERE cat_id=?', (name, cat_id))
 
 def get_items():
     return __simple_get_all("pretty_items", Item)
