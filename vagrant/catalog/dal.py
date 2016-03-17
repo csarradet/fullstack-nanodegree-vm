@@ -176,6 +176,8 @@ def update_category(cat_id, name):
     with get_cursor() as cursor:
         cursor.execute('UPDATE categories SET name=? WHERE cat_id=?', (name, cat_id))
 
+
+
 def get_items():
     return __simple_get_all("pretty_items", Item)
 
@@ -199,6 +201,29 @@ def get_item_by_name(cat_id, item_name):
         output = entity_from_row(Item, cursor.fetchone())
     return output
 
+def get_recent_items(count):
+    output = []
+    with get_cursor() as cursor:
+        cursor.execute('SELECT * FROM pretty_items ORDER BY changed DESC LIMIT ?', (count,))
+        result = cursor.fetchall()
+    for row in result:
+        output.append(entity_from_row(Item, row))
+    return output
+
+def list_items_by_cat():
+    """
+    Returns a list of sorted tuples:
+        Item 0: A category instance
+        Item 1: An array containing all item instances in that category
+    This is used to build the dashboard sidebar; in production, a
+    caching solution or AJAX would be tacked on for performance reasons.
+    """
+    output = []
+    for cat in get_categories():
+        items = get_items_by_cat(cat.cat_id)
+        output.append((cat, items))
+    return output
+
 def create_item(name, category_id, creator_id, pic, description=None):
     id = None
     if description is None:
@@ -213,28 +238,26 @@ def create_item(name, category_id, creator_id, pic, description=None):
 def delete_item(item_id):
     __simple_delete("items", Item, "item_id", item_id)
 
-def get_recent_items(count):
-    output = []
+def update_item(item_id, name=None, description=None, pic=None, cat_id=None):
+    # It would probably be more efficient to smash everything into a single SQL statement;
+    # going to keep it simple for this project though.  Item updates should be fairly
+    # uncommon anyway.
     with get_cursor() as cursor:
-        cursor.execute('SELECT * FROM pretty_items ORDER BY changed DESC LIMIT ?', (count,))
-        result = cursor.fetchall()
-    for row in result:
-        output.append(entity_from_row(Item, row))
-    return output
+        cursor.execute("BEGIN TRANSACTION")
+        if name is not None:
+            cursor.execute("UPDATE items SET name=? WHERE item_id=?", (name, item_id))
 
-def list_items_by_cat():
-    """
-    Returns a list of sorted tuples:
-        Item 0: A category instance
-        Item 1: An array containing all items in that category
-    This is used to build the dashboard sidebar; in production, a
-    caching solution or AJAX would be tacked on for performance reasons.
-    """
-    output = []
-    for cat in get_categories():
-        items = get_items_by_cat(cat.cat_id)
-        output.append((cat, items))
-    return output
+        if description is not None:
+            cursor.execute("UPDATE items SET description=? WHERE item_id=?", (description, item_id))
+
+        if pic is not None:
+            cursor.execute("UPDATE items SET pic=? WHERE item_id=?", (sqlite3.Binary(pic), item_id))
+
+        if cat_id is not None:
+            cursor.execute("UPDATE items SET cat_id=? WHERE item_id=?", (cat_id, item_id))
+
+        cursor.execute("UPDATE items SET changed=(DATETIME('now')) WHERE item_id=?", (item_id))
+        cursor.execute("END TRANSACTION")
 
 
 
