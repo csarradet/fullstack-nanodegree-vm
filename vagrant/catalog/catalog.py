@@ -17,6 +17,7 @@ import bleach
 import imghdr
 import base64
 import json
+import os
 import requests
 from werkzeug import secure_filename
 from flask import (
@@ -410,7 +411,10 @@ def gconnect():
 
 if __name__ == '__main__':
     app.debug = True
-    app.secret_key = "abc123"
+    # Tip from http://stackoverflow.com/questions/14737531/how-to-i-delete-all-flask-sessions,
+    # wipes all existing sessions when the server is restarted.
+    # Handles problems like "phantom" accounts still being logged in after a DB wipe.
+    app.secret_key = os.urandom(32)
     app.config["SESSION_TYPE"] = "filesystem"
     print "Starting catalogifier web service; press ctrl-c to exit."
     app.run(host = '0.0.0.0', port = 5000)
