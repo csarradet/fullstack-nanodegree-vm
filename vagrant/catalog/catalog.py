@@ -160,12 +160,10 @@ def categoryCreate():
     if duplicate:
         return already_exists_error()
 
-    # All checks passed, create the category and show the success page
+    # All checks passed
     generate_nonce()
     cat_id = dal.create_category(cat_name, active_user.user_id)
     return redirect("/")
-
-
 
 @app.route('/catalog/delete-cat/', methods=['POST'])
 def categoryDelete():
@@ -184,11 +182,32 @@ def categoryDelete():
     if active_user.user_id != cat.creator_id:
         return not_authorized_error()
 
-    # All checks passed, delete the category and show the success page
+    # All checks passed
     generate_nonce()
     dal.delete_category(cat.cat_id)
     return redirect("/")
 
+@app.route('/catalog/update-cat/', methods=['POST'])
+    state = request.values.get('state')
+    if not check_nonce(state):
+        return bad_request_error()
+
+    old_cat_name = bleach.clean(request.values.get("cat_update_old_name"))
+    cat = dal.get_category_by_name(old_cat_name)
+    if not cat:
+        return not_found_error()
+
+    active_user = get_active_user()
+    if not active_user:
+        return not_authenticated_error()
+    if active_user.user_id != cat.creator_id:
+        return not_authorized_error()
+
+    # All checks passed
+    generate_nonce()
+    new_cat_name = bleach.clean(request.values.get("cat_update_new_name"))
+    dal.update_category(cat_id, new_cat_name)
+    return redirect("/")
 
 
 @app.route('/catalog/item-list-by-cat/')
@@ -231,7 +250,7 @@ def itemLookupByName(cat_name, item_name):
     if not item:
         return not_found_error()
 
-    # All checks passed, display the item
+    # All checks passed
     return render("item_list.html", items=[item], active_cat=cat_name, active_item=item_name)
 
 
@@ -259,7 +278,7 @@ def itemCreate():
     if not pic_data:
         return bad_request_error()
 
-    # All checks passed, create the item and show the success page
+    # All checks passed
     generate_nonce()
     desc = bleach.clean(request.values.get("description"))
     item_id = dal.create_item(
@@ -322,7 +341,7 @@ def itemDelete():
     if active_user.user_id != item.creator_id:
         return not_authorized_error()
 
-    # All checks passed, delete the item and show the success page
+    # All checks passed
     generate_nonce()
     dal.delete_item(item.item_id)
     return redirect("/")
@@ -412,7 +431,7 @@ def gconnect():
 if __name__ == '__main__':
     app.debug = True
     # Tip from http://stackoverflow.com/questions/14737531/how-to-i-delete-all-flask-sessions,
-    # wipes all existing sessions when the server is restarted.
+    # setting a fresh key wipes all existing sessions when the server is restarted.
     # Handles problems like "phantom" accounts still being logged in after a DB wipe.
     app.secret_key = os.urandom(32)
     app.config["SESSION_TYPE"] = "filesystem"
