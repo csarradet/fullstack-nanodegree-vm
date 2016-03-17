@@ -254,7 +254,6 @@ def itemLookupByName(cat_name, item_name):
     # All checks passed
     return render("item_list.html", items=[item], active_cat=cat_name, active_item=item_name)
 
-
 @app.route('/catalog/create-item/', methods=['POST'])
 def itemCreate():
     state = request.values.get('state')
@@ -275,8 +274,9 @@ def itemCreate():
     if duplicate:
         return already_exists_error()
 
-    pic_data = validate_picture(request.files["item_create_pic"])
-    if not pic_data:
+    try:
+        pic_data = validate_picture(request.files["item_create_pic"])
+    except InvalidPictureError:
         return bad_request_error()
 
     # All checks passed
@@ -300,24 +300,23 @@ def validate_picture(pic):
 
     If pic is a valid picture file that can safely be stored in the db,
     return its base64-encoded binary contents.
+    If the pic is malformed somehow, return False.
     """
     pic.filename = secure_filename(pic.filename)
     if not pic.filename.endswith(".jpg"):
-        logging.error("Picture validation failed: invalid extension")
-        return False
+        raise InvalidPictureError("Invalid extension")
     if len(pic.filename) <= 4:
-        logging.error("Picture validation failed: invalid filename length")
-        return False
+        raise InvalidPictureError("Invalid filename length")
     # Snoop into the file's data to ensure it actually contains a jpg image
     content = pic.read()
     if not imghdr.what("", h=content) == 'jpeg':
-        logging.error("Picture validation failed: invalid file contents")
-        return False
+        raise InvalidPictureError("Invalid file contents")
 
     # All checks passed
     return base64.b64encode(content)
 
-
+class InvalidPictureError(Exception):
+    pass
 
 @app.route('/catalog/delete-item/', methods=['POST'])
 def itemDelete():
@@ -346,6 +345,55 @@ def itemDelete():
     generate_nonce()
     dal.delete_item(item.item_id)
     return redirect("/")
+
+@app.route('/catalog/update-item/', methods=['POST'])
+def itemUpdate():
+    # This will take a few steps. Start with loading the old object and doing
+    # our usual auth process.
+    state = request.values.get('state')
+    if not check_nonce(state):
+        return bad_request_error()
+
+    cat_name = bleach.clean(request.values.get("item_update_old_parent"))
+    cat = dal.get_category_by_name(cat_name)
+    if not cat:
+        return not_found_error()
+
+    active_user = get_active_user()
+    if not active_user:
+        return not_authenticated_error()
+
+    item_name = bleach.clean(request.values.get("item_update_old_name"))
+    item = dal.get_item_by_name(cat.cat_id, item_name)
+    if not item:
+        return not_found_error()
+
+
+    # Item was found, security checks out.  Now pull in the new values from
+    # the request.  If a field is empty (not in request.values, so None), 
+    # it's assumed that the user doesn't want to change it.
+    new_name = bleach.clean(request.values.get("item_update_new_name"))
+
+    desc = bleach.clean(request.values.get("item_update_description"))
+
+    raw_pic_data = request.files["item_update_pic"]
+    pic_data = None
+    try:
+        if raw_pic_data:
+            pic_data = validate_picture(raw_pic_data)
+    except InvalidPictureError:
+        return bad_request_error()
+
+    new_parent_name = bleach.clean(request.values.get("item_update_new_parent"))
+    new_cat = dal.get_category_by_name(new_parent_name)
+    if not new_cat:
+        return not_found_error()
+
+
+    # New values look good.  All checks passed.
+    generate_nonce()
+    dal.update_item(item.item_id, name=new_name, description=desc, pic=pic_data, cat_id=new_cat.cat_id)
+    return redirect("/catalog/{}/{}/".format(cat_name, item_name))
 
 
 
