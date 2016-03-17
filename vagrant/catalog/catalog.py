@@ -207,7 +207,7 @@ def categoryUpdate():
     # All checks passed
     generate_nonce()
     new_cat_name = bleach.clean(request.values.get("cat_update_new_name"))
-    dal.update_category(cat_id, new_cat_name)
+    dal.update_category(cat.cat_id, new_cat_name)
     return redirect("/")
 
 

@@ -29,6 +29,7 @@
         $('#item_create_parent').val(cat_name);
         $('#item_delete_parent').val(cat_name);
         $('#cat_delete_name').val(cat_name);
+        $('#cat_update_old_name').val(cat_name)
     }
 
     function set_cat_and_item(cat_name, item_name){
@@ -59,7 +60,6 @@
 
                         <br />
                         <input type="submit" value="Confirm" class="button btn-primary"/>
-
                     </form>
                 </div>
             </div><!-- /.modal-content -->
@@ -85,12 +85,40 @@
 
                         <br />
                         <input type="submit" value="Confirm" class="button btn-primary" />
-
                     </form>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+
+
+    <!-- bootstrap flyout modal for updating categories -->
+    <!-- uses code from http://getbootstrap.com/javascript/#modals -->
+    <div class="modal fade" id="cat_update_modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Create New Category</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="/catalog/update-cat/">
+                        <input type="hidden" name="state" value="{{ state }}"></input><br />
+
+                        <label for="cat_update_old_name">Old name:</label>
+                        <input type="text" id="cat_update_old_name" name="cat_update_old_name" readonly></input><br />
+
+                        <label for="cat_update_new_name">New name:</label>
+                        <input type="text" id="cat_update_new_name" name="cat_update_new_name"></input><br />
+
+                        <br />
+                        <input type="submit" value="Confirm" class="button btn-primary"/>
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
 
 
     <!-- bootstrap flyout modal for creating items -->
@@ -120,7 +148,6 @@
                             class="button btn-default" /><br />
 
                         <input type="submit" value="Confirm" class="button btn-primary" />
-
                     </form>
                 </div>
             </div><!-- /.modal-content -->
@@ -149,7 +176,6 @@
 
                         <br />
                         <input type="submit" value="Confirm" class="button btn-primary" />
-
                     </form>
                 </div>
             </div><!-- /.modal-content -->
@@ -206,7 +232,9 @@
                                             <span class="glyphicon glyphicon-cog"></span>
                                         </a>
                                         <ul class="dropdown-menu text-primary list-inline">
-                                            <li>Edit</li>
+                                            <li>
+                                                <a data-toggle="modal" data-target="#cat_update_modal" href="#" onclick="set_current_cat('{{ cat_name }}')">Update</a>
+                                            </li>
                                             <li>
                                                 <a data-toggle="modal" data-target="#cat_delete_modal" href="#" onclick="set_current_cat('{{ cat_name }}')">Delete</a>
                                             </li>
