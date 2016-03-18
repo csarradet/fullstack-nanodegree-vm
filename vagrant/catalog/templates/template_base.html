@@ -183,12 +183,6 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
-
-
-
-
-
-
     <!-- bootstrap flyout modal for updating items -->
     <div class="modal fade" id="item_update_modal" tabindex="-1" role="dialog">
         <div class="modal-dialog">
@@ -199,7 +193,7 @@
                 </div>
                 <div class="modal-body">
                     <form method="POST" action="/catalog/update-item/" enctype="multipart/form-data">
-                        <div>All fields are optional; leave them blank to keep any existing values:</div><br />
+                        <h5 class="text-primary">All fields are optional.  Leave them blank to keep any existing values.</h5><hr />
                         <input type="hidden" name="state" value="{{ state }}"></input>
                         <input type="hidden" id="item_update_old_name" name="item_update_old_name"></input>
                         <input type="hidden" id="item_update_old_parent" name="item_update_old_parent"></input>
