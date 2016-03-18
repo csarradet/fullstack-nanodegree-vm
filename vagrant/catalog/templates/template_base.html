@@ -129,26 +129,32 @@
                     <form method="POST" action="/catalog/create-item/" enctype="multipart/form-data">
                         <input type="hidden" name="state" value="{{ state }}"></input>
 
-                        <label for="item_create_name">Name:</label>
-                        <input type="text" id="item_create_name" name="item_create_name" required></input><br />
+                        <div class="form-group">
+                            <label for="item_create_name">Name:</label>
+                            <input class="form-control" type="text" id="item_create_name" name="item_create_name" required></input>
+                        </div>
 
-                        <label for="item_create_description">Description:</label>
-                        <input type="text" id="item_create_description" name="item_create_description" required></input><br />                            
+                        <div class="form-group">
+                            <label for="item_create_description">Description:</label>
+                            <input class="form-control" type="text" id="item_create_description" name="item_create_description" required></input>
+                        </div>
 
-                        <label for="item_create_parent">Category:</label>
-                        <select name="item_create_parent" id="item_create_parent">
-                            {% for cat in items_by_cat %}
-                            <option value="{{ cat[0].name }}">{{ cat[0].name }}</option>
-                            {% endfor %}
-                        </select><br />
+                        <div class="form-group">
+                            <label for="item_create_parent">Category:</label>
+                            <select class="form-control" name="item_create_parent" id="item_create_parent">
+                                {% for cat in items_by_cat %}
+                                <option value="{{ cat[0].name }}">{{ cat[0].name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-                        <br />
-                        <label for="item_create_pic">Picture (.jpg only):</label>
-                        <input type="file" name="item_create_pic" accept=".jpg"
-                            class="button btn-default" required></input><br />
+                        <div class="form-group">
+                            <label for="item_create_pic">Picture (.jpg only):</label>
+                            <input type="file" name="item_create_pic" accept=".jpg"
+                                class="button btn-default form-control" required></input>
+                        </div>
 
-
-                        <input type="submit" value="Confirm" class="button btn-primary" />
+                        <input type="submit" value="Confirm" class="btn btn-primary" />
                     </form>
                 </div>
             </div><!-- /.modal-content -->
