@@ -1,6 +1,6 @@
 """
 This file contains utilities to simplify interaction with Flask sessions,
-like checking the active user or serializing entities into the session.
+like checking the active user or serializing entities into a session variable.
 """
 
 import random
@@ -17,6 +17,7 @@ from entities import User
 
 
 def gibberish(len=32):
+    """ Generates a string of random letters """
     return "".join(random.choice(string.ascii_uppercase +
         string.digits) for x in xrange(len))
 

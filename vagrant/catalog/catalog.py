@@ -34,7 +34,7 @@ from werkzeug import secure_filename
 
 # Project-specific includes
 import dal
-from entities import AuthSource
+from entities import AuthSource, jdefault
 from handler_utils import (
     already_exists_error,
     bad_request_error,
@@ -90,13 +90,6 @@ def jsonEndpoint():
 
     output = json.dumps(cat_dict.values(), default=jdefault)
     return create_json_response(output)
-
-def jdefault(o):
-    """JSON encoder used to handle entity conversions """
-    if isinstance(o, buffer):
-        # Special case for encoding binary picture data on items
-        return str(o)
-    return o.__dict__
 
 @app.route('/catalog.atom')
 def atomEndpoint():

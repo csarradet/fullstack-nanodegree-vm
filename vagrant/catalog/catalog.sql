@@ -3,7 +3,6 @@
 --  to make the project code simpler.  In production more
 --  robust controls would be added to the business logic
 --  layer instead.)
-
 PRAGMA foreign_keys=ON;
 
 -- Wipe any existing data --
@@ -17,7 +16,9 @@ DROP VIEW IF EXISTS pretty_items;
 CREATE TABLE users (
     -- The user's unique ID within our own system
     user_id INTEGER PRIMARY KEY,
+    -- The user's name as displayed by their auth source (e.g. user@example.com)
     username TEXT NOT NULL,
+    -- The service through which this user authenticates (facebook, google+, etc)
     auth_source TEXT NOT NULL,
     -- The user's unique ID, as reported by the auth source
     auth_source_id TEXT NOT NULL
@@ -26,6 +27,7 @@ CREATE TABLE users (
 CREATE TABLE categories (
     cat_id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
+    -- The user that owns this category
     creator_id INTEGER NOT NULL,
     FOREIGN KEY(creator_id) REFERENCES users(user_id) ON DELETE CASCADE
     );
@@ -36,7 +38,9 @@ CREATE TABLE items (
     description TEXT NOT NULL,
     --Binary JPEG data, base64 encoded
     pic BLOB NOT NULL,
+    -- The category to which this item belongs
     cat_id INTEGER NOT NULL,
+    -- The user that owns this item
     creator_id INTEGER NOT NULL,
     changed DATETIME NOT NULL,
     FOREIGN KEY(cat_id) REFERENCES categories(cat_id) ON DELETE CASCADE,
@@ -45,6 +49,7 @@ CREATE TABLE items (
 
 
 -- Create views --
+-- These are used by the DAL to pull all related info on an item/cat with a single query
 CREATE VIEW pretty_categories AS
     SELECT c.cat_id, c.name, c.creator_id,
         u.username AS creator_name
