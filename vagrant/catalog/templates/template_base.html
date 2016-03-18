@@ -166,16 +166,19 @@
                 <div class="modal-body">
                     <form method="POST" action="/catalog/delete-item/">
                         <input type="hidden" name="state" value="{{ state }}"></input>
-                        <div>Are you sure you want to delete the following item?</div>
+                        <h5 class="text-primary">Are you sure you want to delete the following item?</h5><hr />
 
-                        <label for="item_delete_name">Name:</label>
-                        <input type="text" id="item_delete_name" name="item_delete_name" readonly></input><br />
+                        <div class="form-group">
+                            <label for="item_delete_name">Name:</label>
+                            <input class="form-control" type="text" id="item_delete_name" name="item_delete_name" readonly></input>
+                        </div>
 
-                        <label for="item_delete_parent">Category:</label>
-                        <input type="text" id="item_delete_parent" name="item_delete_parent" readonly></input><br />
+                        <div class="form-group">
+                            <label for="item_delete_parent">Category:</label>
+                            <input class="form-control" type="text" id="item_delete_parent" name="item_delete_parent" readonly></input>
+                        </div>
 
-                        <br />
-                        <input type="submit" value="Confirm" class="button btn-primary" />
+                        <input type="submit" value="Confirm" class="btn btn-primary" />
                     </form>
                 </div>
             </div><!-- /.modal-content -->
