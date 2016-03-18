@@ -184,10 +184,13 @@ def get_items():
 def get_item(item_id):
     return __simple_get("pretty_items", Item, "item_id", item_id)
 
-def get_items_by_cat(cat_id):
+def get_items_by_cat(cat_id, lightweight=False):
     output = []
     with get_cursor() as cursor:
-        cursor.execute('SELECT * FROM pretty_items WHERE cat_id = ?', (cat_id,))
+        if lightweight:
+            cursor.execute('SELECT * FROM pretty_items_light WHERE cat_id = ?', (cat_id,))
+        else:
+            cursor.execute('SELECT * FROM pretty_items WHERE cat_id = ?', (cat_id,))            
         result = cursor.fetchall()
     for row in result:
         output.append(entity_from_row(Item, row))
@@ -220,7 +223,7 @@ def list_items_by_cat():
     """
     output = []
     for cat in get_categories():
-        items = get_items_by_cat(cat.cat_id)
+        items = get_items_by_cat(cat.cat_id, lightweight=True)
         output.append((cat, items))
     return output
 

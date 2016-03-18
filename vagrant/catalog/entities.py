@@ -64,4 +64,5 @@ class Item(Entity):
     creator_id = None
     creator_name = None
     changed = None
+    pic_id = None
     pic = None
