@@ -243,7 +243,6 @@ def update_item(item_id, name=None, description=None, pic=None, cat_id=None):
     # going to keep it simple for this project though.  Item updates should be fairly
     # uncommon anyway.
     with get_cursor() as cursor:
-        cursor.execute("BEGIN TRANSACTION")
         if name is not None:
             cursor.execute("UPDATE items SET name=? WHERE item_id=?", (name, item_id))
 
@@ -256,8 +255,7 @@ def update_item(item_id, name=None, description=None, pic=None, cat_id=None):
         if cat_id is not None:
             cursor.execute("UPDATE items SET cat_id=? WHERE item_id=?", (cat_id, item_id))
 
-        cursor.execute("UPDATE items SET changed=(DATETIME('now')) WHERE item_id=?", (item_id))
-        cursor.execute("END TRANSACTION")
+        cursor.execute("UPDATE items SET changed=DATETIME('now') WHERE item_id=?", (item_id,))
 
 
 

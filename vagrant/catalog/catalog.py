@@ -354,29 +354,29 @@ def itemUpdate():
     if not check_nonce(state):
         return bad_request_error()
 
-    cat_name = bleach.clean(request.values.get("item_update_old_parent"))
-    cat = dal.get_category_by_name(cat_name)
-    if not cat:
+    old_parent_name = bleach.clean(request.values.get("item_update_old_parent"))
+    old_parent = dal.get_category_by_name(old_parent_name)
+    if not old_parent:
         return not_found_error()
 
     active_user = get_active_user()
     if not active_user:
         return not_authenticated_error()
 
-    item_name = bleach.clean(request.values.get("item_update_old_name"))
-    item = dal.get_item_by_name(cat.cat_id, item_name)
-    if not item:
+    old_item_name = bleach.clean(request.values.get("item_update_old_name"))
+    old_item = dal.get_item_by_name(old_parent.cat_id, old_item_name)
+    if not old_item:
         return not_found_error()
 
 
     # Item was found, security checks out.  Now pull in the new values from
-    # the request.  If a field is empty (not in request.values, so None), 
-    # it's assumed that the user doesn't want to change it.
-    new_name = bleach.clean(request.values.get("item_update_new_name"))
+    # the request.  If a field is empty, it's assumed that the user doesn't
+    # want to change it.  Set to None so the DAL will skip those.
+    new_item_name = bleach.clean(request.values.get("item_update_new_name")) or None
 
-    desc = bleach.clean(request.values.get("item_update_description"))
+    desc = bleach.clean(request.values.get("item_update_description")) or None
 
-    raw_pic_data = request.files["item_update_pic"]
+    raw_pic_data = request.files["item_update_pic"] or None
     pic_data = None
     try:
         if raw_pic_data:
@@ -384,16 +384,18 @@ def itemUpdate():
     except InvalidPictureError:
         return bad_request_error()
 
-    new_parent_name = bleach.clean(request.values.get("item_update_new_parent"))
-    new_cat = dal.get_category_by_name(new_parent_name)
+    new_parent_name = bleach.clean(request.values.get("item_update_new_parent")) or None
+
+    new_cat = dal.get_category_by_name(new_parent_name) or None
     if not new_cat:
         return not_found_error()
 
-
     # New values look good.  All checks passed.
     generate_nonce()
-    dal.update_item(item.item_id, name=new_name, description=desc, pic=pic_data, cat_id=new_cat.cat_id)
-    return redirect("/catalog/{}/{}/".format(cat_name, item_name))
+    dal.update_item(old_item.item_id, name=new_item_name, description=desc, pic=pic_data, cat_id=new_cat.cat_id)
+    redirect_cat = new_parent_name or old_parent_name
+    redirect_item = new_item_name or old_item_name
+    return redirect("/catalog/{}/{}/".format(redirect_cat, redirect_item))
 
 
 
@@ -479,10 +481,14 @@ def gconnect():
 
 if __name__ == '__main__':
     app.debug = True
+    
     # Tip from http://stackoverflow.com/questions/14737531/how-to-i-delete-all-flask-sessions,
     # setting a fresh key wipes all existing sessions when the server is restarted.
     # Handles problems like "phantom" accounts still being logged in after a DB wipe.
-    app.secret_key = os.urandom(32)
+    #app.secret_key = os.urandom(32)
+    # Using a static key for testing, though:
+    app.secret_key = "abc"
+    
     app.config["SESSION_TYPE"] = "filesystem"
     print "Starting catalogifier web service; press ctrl-c to exit."
     app.run(host = '0.0.0.0', port = 5000)

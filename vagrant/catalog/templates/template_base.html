@@ -39,7 +39,6 @@
         set_current_cat(cat_name);
         $('#item_delete_name').val(item_name)
         $('#item_update_old_name').val(item_name)
-        $('#item_update_new_name').val(item_name)
     }
     </script>
 
@@ -200,12 +199,17 @@
                 </div>
                 <div class="modal-body">
                     <form method="POST" action="/catalog/update-item/" enctype="multipart/form-data">
+                        <div>All fields are optional; leave them blank to keep any existing values:</div><br />
                         <input type="hidden" name="state" value="{{ state }}"></input>
                         <input type="hidden" id="item_update_old_name" name="item_update_old_name"></input>
                         <input type="hidden" id="item_update_old_parent" name="item_update_old_parent"></input>
 
                         <label for="item_update_new_name">New name:</label>
                         <input type="text" id="item_update_new_name" name="item_update_new_name"></input><br />
+
+
+                        <label for="item_update_description">New description:</label>
+                        <input type="text" id="item_update_description" name="item_update_description"></input><br />
 
                         <label for="item_update_new_parent">Category:</label>
                         <select name="item_update_new_parent" id="item_update_new_parent">
@@ -214,8 +218,8 @@
                             {% endfor %}
                         </select><br />
 
-                        <label for="item_create_pic">Picture (.jpg only):</label>
-                        <input type="file" name="item_create_pic" accept=".jpg"
+                        <label for="item_update_pic">Picture (.jpg only):</label>
+                        <input type="file" name="item_update_pic" accept=".jpg"
                             class="button btn-default" /><br />
 
                         <input type="submit" value="Confirm" class="button btn-primary" />
@@ -307,7 +311,9 @@
                                         <span class="glyphicon glyphicon-cog"></span>
                                     </a>
                                     <ul class="dropdown-menu text-primary list-inline">
-                                        <li>Edit</li>
+                                        <li>
+                                            <a data-toggle="modal" data-target="#item_update_modal" href="#" onclick="set_cat_and_item('{{ cat_name }}','{{ item_name }}')">Update</a>
+                                        </li>
                                         <li>
                                             <a data-toggle="modal" data-target="#item_delete_modal" href="#" onclick="set_cat_and_item('{{ cat_name }}','{{ item_name }}')">Delete</a>
                                         </li>
