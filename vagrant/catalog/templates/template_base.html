@@ -132,6 +132,9 @@
                         <label for="item_create_name">Name:</label>
                         <input type="text" id="item_create_name" name="item_create_name" required></input><br />
 
+                        <label for="item_create_description">Description:</label>
+                        <input type="text" id="item_create_description" name="item_create_description" required></input><br />                            
+
                         <label for="item_create_parent">Category:</label>
                         <select name="item_create_parent" id="item_create_parent">
                             {% for cat in items_by_cat %}
@@ -144,8 +147,6 @@
                         <input type="file" name="item_create_pic" accept=".jpg"
                             class="button btn-default" required></input><br />
 
-                        <label for="item_create_description">Description:</label>
-                        <input type="text" id="item_create_description" name="item_create_description" required></input><br />                            
 
                         <input type="submit" value="Confirm" class="button btn-primary" />
                     </form>
@@ -196,26 +197,33 @@
                         <input type="hidden" id="item_update_old_name" name="item_update_old_name"></input>
                         <input type="hidden" id="item_update_old_parent" name="item_update_old_parent"></input>
 
-                        <label for="item_update_new_name">New name:</label>
-                        <input type="text" id="item_update_new_name" name="item_update_new_name"></input><br />
+                        <div class="form-group">
+                            <label for="item_update_new_name">New name:</label>
+                            <input class="form-control" type="text" id="item_update_new_name" name="item_update_new_name"></input>
+                        </div>
 
+                        <div class="form-group">
+                            <label for="item_update_description">New description:</label>
+                            <input class="form-control" type="text" id="item_update_description" name="item_update_description"></input>
+                        </div>
 
-                        <label for="item_update_description">New description:</label>
-                        <input type="text" id="item_update_description" name="item_update_description"></input><br />
+                        <div class="form-group">
+                            <label for="item_update_new_parent">Category:</label>
+                            <select name="item_update_new_parent" id="item_update_new_parent" class="form-control">
+                                <option value="">
+                                {% for cat in items_by_cat %}
+                                <option value="{{ cat[0].name }}">{{ cat[0].name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-                        <label for="item_update_new_parent">Category:</label>
-                        <select name="item_update_new_parent" id="item_update_new_parent">
-                            <option value="">
-                            {% for cat in items_by_cat %}
-                            <option value="{{ cat[0].name }}">{{ cat[0].name }}</option>
-                            {% endfor %}
-                        </select><br />
+                        <div class="form-group">
+                            <label for="item_update_pic">Picture (.jpg only):</label>
+                            <input type="file" name="item_update_pic" accept=".jpg"
+                                class="button btn-default form-control" />
+                        </div>
 
-                        <label for="item_update_pic">Picture (.jpg only):</label>
-                        <input type="file" name="item_update_pic" accept=".jpg"
-                            class="button btn-default" /><br />
-
-                        <input type="submit" value="Confirm" class="button btn-primary" />
+                        <input type="submit" value="Confirm" class="btn btn-primary" />
                     </form>
                 </div>
             </div><!-- /.modal-content -->
