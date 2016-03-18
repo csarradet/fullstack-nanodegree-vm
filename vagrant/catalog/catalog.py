@@ -373,7 +373,6 @@ def itemUpdate():
     # the request.  If a field is empty, it's assumed that the user doesn't
     # want to change it.  Set to None so the DAL will skip those.
     new_item_name = bleach.clean(request.values.get("item_update_new_name")) or None
-
     desc = bleach.clean(request.values.get("item_update_description")) or None
 
     raw_pic_data = request.files["item_update_pic"] or None
@@ -386,13 +385,12 @@ def itemUpdate():
 
     new_parent_name = bleach.clean(request.values.get("item_update_new_parent")) or None
 
-    new_cat = dal.get_category_by_name(new_parent_name) or None
-    if not new_cat:
-        return not_found_error()
+    new_cat = dal.get_category_by_name(new_parent_name)
+    new_cat_id = new_cat.cat_id if new_cat else None
 
     # New values look good.  All checks passed.
     generate_nonce()
-    dal.update_item(old_item.item_id, name=new_item_name, description=desc, pic=pic_data, cat_id=new_cat.cat_id)
+    dal.update_item(old_item.item_id, name=new_item_name, description=desc, pic=pic_data, cat_id=new_cat_id)
     redirect_cat = new_parent_name or old_parent_name
     redirect_item = new_item_name or old_item_name
     return redirect("/catalog/{}/{}/".format(redirect_cat, redirect_item))

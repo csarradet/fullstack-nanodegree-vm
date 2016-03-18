@@ -29,7 +29,6 @@
         $('#item_create_parent').val(cat_name);
         $('#item_delete_parent').val(cat_name);
         $('#item_update_old_parent').val(cat_name);
-        $('#item_update_new_parent').val(cat_name);
         $('#cat_delete_name').val(cat_name);
         $('#cat_update_old_name').val(cat_name)
     }
@@ -59,7 +58,7 @@
                         <input type="hidden" name="state" value="{{ state }}"></input>
 
                         <label for="cat_create_name">Name:</label>
-                        <input type="text" id="cat_create_name" name="cat_create_name"></input><br />
+                        <input type="text" id="cat_create_name" name="cat_create_name" required></input><br />
 
                         <br />
                         <input type="submit" value="Confirm" class="button btn-primary"/>
@@ -108,7 +107,7 @@
                         <input type="hidden" id="cat_update_old_name" name="cat_update_old_name"></input>
 
                         <label for="cat_update_new_name">New name:</label>
-                        <input type="text" id="cat_update_new_name" name="cat_update_new_name"></input><br />
+                        <input type="text" id="cat_update_new_name" name="cat_update_new_name" required></input><br />
 
                         <br />
                         <input type="submit" value="Confirm" class="button btn-primary"/>
@@ -132,7 +131,7 @@
                         <input type="hidden" name="state" value="{{ state }}"></input>
 
                         <label for="item_create_name">Name:</label>
-                        <input type="text" id="item_create_name" name="item_create_name"></input><br />
+                        <input type="text" id="item_create_name" name="item_create_name" required></input><br />
 
                         <label for="item_create_parent">Category:</label>
                         <select name="item_create_parent" id="item_create_parent">
@@ -144,10 +143,10 @@
                         <br />
                         <label for="item_create_pic">Picture (.jpg only):</label>
                         <input type="file" name="item_create_pic" accept=".jpg"
-                            class="button btn-default" /><br />
+                            class="button btn-default" required></input><br />
 
                         <label for="item_create_description">Description:</label>
-                        <input type="text" id="item_create_description" name="item_create_description"></input><br />                            
+                        <input type="text" id="item_create_description" name="item_create_description" required></input><br />                            
 
                         <input type="submit" value="Confirm" class="button btn-primary" />
                     </form>
@@ -207,6 +206,7 @@
 
                         <label for="item_update_new_parent">Category:</label>
                         <select name="item_update_new_parent" id="item_update_new_parent">
+                            <option value="">
                             {% for cat in items_by_cat %}
                             <option value="{{ cat[0].name }}">{{ cat[0].name }}</option>
                             {% endfor %}
