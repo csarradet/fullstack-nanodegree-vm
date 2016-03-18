@@ -2,14 +2,25 @@
 
 {% block content %}
 
-        {{ item.item_id }}<br />
-        {{ item.name }}<br />
-        {{ item.description }}<br />
-        {{ item.cat_id }}<br />
-        {{ item.cat_name }}<br />
-        {{ item.creator_id }}<br />
-        {{ item.creator_name }}<br />
-        {{ item.changed }}<br />
-        <img src="data:image/jpeg;base64,{{ item.pic }}" /><br />
+        <h3>{{ item.name }}</h3><hr />
+        <div>
+            <img class="img-thumbnail" src="data:image/jpeg;base64,{{ item.pic }}" />
+        </div><br />
+        <div>
+            <div>Category:</div>
+            <div class="well">{{ item.cat_name }}</div>
+        </div><br />        
+        <div>
+            <div>Description:</div>
+            <div class="well">{{ item.description }}</div>
+        </div><br />
+        <div>
+            <div>Created by:</div>
+            <div class="well">{{ item.creator_name }}</div>
+        </div><br />
+        <div>
+            <div>Last Updated:</div>
+            <div class="well">{{ item.changed }}</div>
+        </div><br />
 
 {% endblock %}
