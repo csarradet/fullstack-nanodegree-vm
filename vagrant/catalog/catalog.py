@@ -310,7 +310,6 @@ def itemUpdate():
     if not old_item:
         return not_found_error()
 
-
     # Item was found, security checks out.  Now pull in the new values from
     # the request.  If a field is empty, it's assumed that the user doesn't
     # want to change it.  Set to None so the DAL will skip those.
@@ -348,8 +347,7 @@ def logout():
 @app.route('/login')
 def showLogin():
     """ Creates a nonce and displays the page listing available login options. """
-    state = generate_nonce()
-    return render("login.html", STATE=state)
+    return render("login.html")
 
 @app.route('/gconnect', methods=["POST"])
 def gconnect():
@@ -413,6 +411,7 @@ def gconnect():
         return create_err_response(
             "Received invalid user data\n\nanswer.text: {}\n\ndata: {}".format(
                 answer.text, data), 401)
+    generate_nonce()
     return "Authentication successful"
 
 
