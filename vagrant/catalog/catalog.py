@@ -6,23 +6,23 @@ defines the methods that receive user input, perform safety checks,
 and interact with the DAL to perform CRUD operations.
 """
 
+# Python library includes
+import base64
+import bleach
+import httplib2
+import imghdr
+import json
 import logging
 logging.basicConfig()
 logger = logging.getLogger(__name__)
-
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
-import httplib2
-import bleach
-import imghdr
-import base64
-import json
 import os
 import requests
-from werkzeug import secure_filename
+
+# Third-party includes
 from flask import (
     Flask,
-    flash,
     redirect,
     request,
     session,
@@ -30,30 +30,32 @@ from flask import (
 app = Flask(__name__)
 CLIENT_ID = json.loads(
     open("client_secrets.json", "r").read())["web"]["client_id"]
+from werkzeug import secure_filename
 
+# Project-specific includes
 import dal
-from entities import AuthSource, Entity
+from entities import AuthSource
 from handler_utils import (
-    date_to_atom_friendly,
-    render,
+    already_exists_error,
+    bad_request_error,
     create_atom_response,
     create_err_response,
     create_json_response,
-    already_exists_error,
-    bad_request_error,
+    date_to_atom_friendly,
+    internal_error,
     not_authenticated_error,
     not_authorized_error,
     not_found_error,
-    internal_error
+    render
     )
 from session_utils import (
-    SessionKeys,
-    save_to_session,
-    load_from_session,
-    generate_nonce,
     check_nonce,
-    set_active_user,
+    generate_nonce,
     get_active_user
+    load_from_session,
+    save_to_session,
+    SessionKeys,
+    set_active_user,
     )
 
 
@@ -66,21 +68,12 @@ def download_static_file(filename):
     return send_from_directory("/static", filename, as_attachment=True)
 
 @app.route('/')
-def helloWorld():
+def dashboard():
     """ Serves the splash page for the application. """
     recent_items = dal.get_recent_items(5)
     return render("dashboard.html", recent_items=recent_items)
 
 
-
-
-
-def jdefault(o):
-    # JSON encoder used to handle entity conversions
-    if isinstance(o, buffer):
-        # Special case for encoding binary picture data on items
-        return str(o)
-    return o.__dict__
 
 @app.route('/catalog.json')
 def jsonEndpoint():
@@ -98,6 +91,12 @@ def jsonEndpoint():
     output = json.dumps(cat_dict.values(), default=jdefault)
     return create_json_response(output)
 
+def jdefault(o):
+    """JSON encoder used to handle entity conversions """
+    if isinstance(o, buffer):
+        # Special case for encoding binary picture data on items
+        return str(o)
+    return o.__dict__
 
 @app.route('/catalog.atom')
 def atomEndpoint():
@@ -243,7 +242,7 @@ def validate_picture(pic):
 
     If pic is a valid picture file that can safely be stored in the db,
     return its base64-encoded binary contents.
-    If the pic is malformed somehow, return False.
+    If the pic is malformed somehow, throws a descriptive InvalidPictureError.
     """
     pic.filename = secure_filename(pic.filename)
     if not pic.filename.endswith(".jpg"):
