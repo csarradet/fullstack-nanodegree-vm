@@ -30,7 +30,7 @@ function signInCallback(authResult){
         // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main page
         $.ajax({
             type: "POST",
-            url: "/gconnect?state={{STATE}}",
+            url: "/gconnect?state={{state}}",
             processData: false,
             contentType: "application/octet-stream; charset=utf-8",
             data: authResult["code"],

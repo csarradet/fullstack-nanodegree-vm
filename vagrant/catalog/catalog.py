@@ -51,11 +51,11 @@ from handler_utils import (
 from session_utils import (
     check_nonce,
     generate_nonce,
-    get_active_user
+    get_active_user,
     load_from_session,
     save_to_session,
     SessionKeys,
-    set_active_user,
+    set_active_user
     )
 
 
