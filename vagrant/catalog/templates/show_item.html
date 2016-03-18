@@ -1,31 +1,15 @@
 {% extends "template_base.html" %}
 
 {% block content %}
-    <h2>Item list:</h2>
-    <table>
-    <tr>
-        <td>Local ID</td>
-        <td>Name</td>
-        <td>Description</td>
-        <td>Category ID</td>
-        <td>Category Name</td>
-        <td>Creator ID</td>
-        <td>Creator Name</td>
-        <td>Date Changed</td>
-        <td>Picture</td>
-    </tr>
-    {% for i in items %}
-    <tr>
-        <td>{{ i.item_id }}</td>
-        <td>{{ i.name }}</td>
-        <td>{{ i.description }}</td>
-        <td>{{ i.cat_id }}</td>
-        <td>{{ i.cat_name }}</td>
-        <td>{{ i.creator_id }}</td>
-        <td>{{ i.creator_name }}</td>
-        <td>{{ i.changed }}</td>
-        <td><img src="data:image/jpeg;base64,{{ i.pic }}" /></td>
-    </tr>
-    {% endfor %}
-    </table>
+
+        {{ item.item_id }}<br />
+        {{ item.name }}<br />
+        {{ item.description }}<br />
+        {{ item.cat_id }}<br />
+        {{ item.cat_name }}<br />
+        {{ item.creator_id }}<br />
+        {{ item.creator_name }}<br />
+        {{ item.changed }}<br />
+        <img src="data:image/jpeg;base64,{{ item.pic }}" /><br />
+
 {% endblock %}

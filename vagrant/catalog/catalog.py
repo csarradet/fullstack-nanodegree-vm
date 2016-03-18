@@ -194,7 +194,7 @@ def itemLookupByName(cat_name, item_name):
         return not_found_error()
 
     # All checks passed
-    return render("show_item.html", items=[item], active_cat=cat_name, active_item=item_name)
+    return render("show_item.html", item=item, active_cat=cat_name, active_item=item_name)
 
 @app.route('/catalog/create-item/', methods=['POST'])
 def itemCreate():
