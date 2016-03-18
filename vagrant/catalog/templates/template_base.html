@@ -45,7 +45,7 @@
 </head>
 <body>
     <!-- bootstrap flyout modal for creating categories -->
-    <!-- uses code from http://getbootstrap.com/javascript/#modals -->
+    <!-- (all modals use code from http://getbootstrap.com/javascript/#modals) -->
     <div class="modal fade" id="cat_create_modal" tabindex="-1" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -93,7 +93,6 @@
     </div><!-- /.modal -->
 
     <!-- bootstrap flyout modal for updating categories -->
-    <!-- uses code from http://getbootstrap.com/javascript/#modals -->
     <div class="modal fade" id="cat_update_modal" tabindex="-1" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -225,7 +224,6 @@
 
 
 
-
     <!-- Start of visible page content -->
     <!-- bootstrap navbar -->
     <nav id="header" class="navbar navbar-default">
@@ -284,7 +282,7 @@
                                     </span>
                                     {% endif %}
                                 {% endif %}
-
+                                <!-- show the count of items in this cat as a number badge -->
                                 <span class="badge">{{ item_list|length }}</span>
                             </span>
                         </div>
@@ -346,15 +344,5 @@
             </div>
         </div>
     </div> <!-- /container -->
-
-
-
-
-
-
-
-
-
 </body>
 </html>
-

@@ -78,7 +78,7 @@ def helloWorld():
 def jdefault(o):
     # JSON encoder used to handle entity conversions
     if isinstance(o, buffer):
-        # Special case for encoding binary picture data on items:
+        # Special case for encoding binary picture data on items
         return str(o)
     return o.__dict__
 
@@ -116,33 +116,6 @@ def atomEndpoint():
     output = render("atom.xml", last_updated=last_updated, items=recent_items)
     return create_atom_response(output)
 
-
-
-@app.route('/user-list/')
-def userList():
-    user_list = dal.get_users()
-    return render("user_list.html", users=user_list)
-
-@app.route('/users/<int:user_id>/')
-def userLookup(user_id):
-    user = [dal.get_user(user_id)]
-    if not user:
-        return not_found_error()
-    return render("user_list.html", users=user)
-
-
-
-@app.route('/catalog/category-list/')
-def categoryList():
-    cat_list = dal.get_categories()
-    return render("cat_list.html", categories=cat_list)
-
-@app.route('/catalog/<cat_name>/')
-def categoryNameLookup(cat_name):
-    cat = [dal.get_category_by_name(cat_name)]
-    if not cat:
-        return not_found_error()
-    return render("cat_list.html", categories=cat)
 
 
 @app.route('/catalog/create-cat/', methods=['POST'])
@@ -211,36 +184,6 @@ def categoryUpdate():
     return redirect("/")
 
 
-@app.route('/catalog/item-list-by-cat/')
-def itemListByCat():
-    grouped_items = dal.list_items_by_cat()
-    return render("text_dump.html", content=grouped_items)
-
-@app.route('/catalog/item-list/')
-def itemList():
-    item_list = dal.get_items()
-    return render("item_list.html", items=item_list)
-
-@app.route('/catalog/item-list/<int:count>/')
-def recentItems(count):
-    item_list = dal.get_recent_items(count)
-    return render("item_list.html", items=item_list)
-
-@app.route('/catalog/<cat_name>/item-list/')
-def itemListByCategory(cat_name):
-    cat = dal.get_category_by_name(cat_name)
-    if not cat:
-        return not_found_error()
-    item_list = dal.get_items_by_cat(cat.cat_id)
-    return render("item_list.html", items=item_list)
-
-@app.route('/catalog/item-by-id/<item_id>/')
-def itemLookupById(item_id):
-    item = dal.get_item(item_id)
-    if not item:
-        return not_found_error()
-    return render("item_list.html", items=[item])
-
 @app.route('/catalog/<cat_name>/<item_name>/')
 def itemLookupByName(cat_name, item_name):
     cat = dal.get_category_by_name(cat_name)
@@ -252,7 +195,7 @@ def itemLookupByName(cat_name, item_name):
         return not_found_error()
 
     # All checks passed
-    return render("item_list.html", items=[item], active_cat=cat_name, active_item=item_name)
+    return render("show_item.html", items=[item], active_cat=cat_name, active_item=item_name)
 
 @app.route('/catalog/create-item/', methods=['POST'])
 def itemCreate():
@@ -483,9 +426,7 @@ if __name__ == '__main__':
     # Tip from http://stackoverflow.com/questions/14737531/how-to-i-delete-all-flask-sessions,
     # setting a fresh key wipes all existing sessions when the server is restarted.
     # Handles problems like "phantom" accounts still being logged in after a DB wipe.
-    #app.secret_key = os.urandom(32)
-    # Using a static key for testing, though:
-    app.secret_key = "abc"
+    app.secret_key = os.urandom(32)
     
     app.config["SESSION_TYPE"] = "filesystem"
     print "Starting catalogifier web service; press ctrl-c to exit."
