@@ -79,13 +79,14 @@
                 <div class="modal-body">
                     <form method="POST" action="/catalog/delete-cat/">
                         <input type="hidden" name="state" value="{{ state }}"></input>
-                        <div>Are you sure you want to delete the following category?</div>
+                        <h5 class="text-primary">Are you sure you want to delete the following category?</h5><hr />
 
-                        <label for="cat_delete_name">Name:</label>
-                        <input type="text" id="cat_delete_name" name="cat_delete_name" readonly></input><br />
+                        <div class="form-group">
+                            <label for="cat_delete_name">Name:</label>
+                            <input class="form-control" type="text" id="cat_delete_name" name="cat_delete_name" readonly></input>
+                        </div>
 
-                        <br />
-                        <input type="submit" value="Confirm" class="button btn-primary" />
+                        <input type="submit" value="Confirm" class="btn btn-primary" />
                     </form>
                 </div>
             </div><!-- /.modal-content -->
