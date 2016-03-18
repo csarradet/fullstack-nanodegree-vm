@@ -105,11 +105,12 @@
                         <input type="hidden" name="state" value="{{ state }}"></input>
                         <input type="hidden" id="cat_update_old_name" name="cat_update_old_name"></input>
 
-                        <label for="cat_update_new_name">New name:</label>
-                        <input type="text" id="cat_update_new_name" name="cat_update_new_name" required></input><br />
+                        <div class="form-group">
+                            <label for="cat_update_new_name">New name:</label>
+                            <input class="form-control" type="text" id="cat_update_new_name" name="cat_update_new_name" required></input>
+                        </div>
 
-                        <br />
-                        <input type="submit" value="Confirm" class="button btn-primary"/>
+                        <input type="submit" value="Confirm" class="btn btn-primary"/>
                     </form>
                 </div>
             </div><!-- /.modal-content -->
