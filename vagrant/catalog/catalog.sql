@@ -48,13 +48,13 @@ CREATE TABLE items (
     );
 
 
--- SQLite has trouble operating on rows that contain large blobs, 
+-- SQLite has trouble operating on rows that contain large blobs,
 -- moving pictures into their own table as a workaround.
 -- 1:1 mapping between items and pictures
 CREATE TABLE pictures (
-    pic_id INTEGER PRIMARY KEY, 
+    pic_id INTEGER PRIMARY KEY,
     --Binary JPEG data, base64 encoded
-    pic BLOB NOT NULL,
+    pic BLOB NOT NULL
     );
 
 -- Create views --
@@ -85,4 +85,3 @@ CREATE VIEW pretty_items_light AS
         JOIN users AS u ON (i.creator_id = u.user_id)
         JOIN categories AS c ON (i.cat_id = c.cat_id)
     ;
-    
