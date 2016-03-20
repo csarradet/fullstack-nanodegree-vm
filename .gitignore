@@ -1,2 +1,5 @@
 # Ignore working files for upped Vagrant boxes
 **/.vagrant/
+*.pyc
+*.db
+data source=catalog.db; foreign keys=true;
