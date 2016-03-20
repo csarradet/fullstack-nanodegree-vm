@@ -82,9 +82,6 @@ def render(filename, **kwargs):
     required by our base template, like info on the logged in user.
     """
     kwargs["current_user"] = get_active_user()
-    logging.error("***START")
     kwargs["items_by_cat"] = list_items_by_cat()
-    logging.error("Sample item: {}".format())
-    logging.error("***END")
     kwargs["state"] = get_current_nonce()
     return render_template(filename, **kwargs)

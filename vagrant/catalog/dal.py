@@ -190,7 +190,7 @@ def get_items_by_cat(cat_id, lightweight=False):
         if lightweight:
             cursor.execute('SELECT * FROM pretty_items_light WHERE cat_id = ?', (cat_id,))
         else:
-            cursor.execute('SELECT * FROM pretty_items WHERE cat_id = ?', (cat_id,))            
+            cursor.execute('SELECT * FROM pretty_items WHERE cat_id = ?', (cat_id,))
         result = cursor.fetchall()
     for row in result:
         output.append(entity_from_row(Item, row))
@@ -232,8 +232,15 @@ def create_item(name, category_id, creator_id, pic, description=None):
     if description is None:
         description = "Placeholder item description"
     with get_cursor() as cursor:
-        cursor.execute("INSERT INTO items VALUES (null,?,?,?,?,?,(DATETIME('now')))", (
-            name, description, sqlite3.Binary(pic), category_id, creator_id))
+        # First, create the picture and get its new ID number
+        cursor.execute("INSERT INTO pictures VALUES (null, ?)",
+            (sqlite3.Binary(pic),))
+        cursor.execute('SELECT last_insert_rowid()')
+        pic_id = cursor.fetchone()[0]
+
+        # Now create the actual item and return its ID
+        cursor.execute("INSERT INTO items VALUES (null,?,?,?,?,?,(DATETIME('now')))",
+            (name, description, pic_id, category_id, creator_id))
         cursor.execute('SELECT last_insert_rowid()')
         id = cursor.fetchone()[0]
     return id

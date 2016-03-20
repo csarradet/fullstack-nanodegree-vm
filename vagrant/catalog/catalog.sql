@@ -9,8 +9,10 @@ PRAGMA foreign_keys=ON;
 DROP TABLE IF EXISTS items;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS pictures;
 DROP VIEW IF EXISTS pretty_categories;
 DROP VIEW IF EXISTS pretty_items;
+DROP VIEW IF EXISTS pretty_items_light;
 
 -- Create tables --
 CREATE TABLE users (
@@ -42,20 +44,25 @@ CREATE TABLE items (
     cat_id INTEGER NOT NULL,
     -- The user that owns this item
     creator_id INTEGER NOT NULL,
+    -- The last time this object was created or modified
     changed DATETIME NOT NULL,
     FOREIGN KEY(cat_id) REFERENCES categories(cat_id) ON DELETE CASCADE,
-    FOREIGN KEY(creator_id) REFERENCES users(user_id) ON DELETE CASCADE
+    FOREIGN KEY(creator_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY(pic_id) REFERENCES pictures(pic_id) ON DELETE CASCADE
     );
-
 
 -- SQLite has trouble operating on rows that contain large blobs,
 -- moving pictures into their own table as a workaround.
--- 1:1 mapping between items and pictures
+-- 1:1 mapping between items and pictures in this implementation,
+-- but it would be possible to add in caching if many users were
+-- expected to share the same image.
 CREATE TABLE pictures (
     pic_id INTEGER PRIMARY KEY,
     --Binary JPEG data, base64 encoded
     pic BLOB NOT NULL
     );
+
+
 
 -- Create views --
 -- These are used by the DAL to pull all related info on an item/cat with a single query
@@ -77,6 +84,8 @@ CREATE VIEW pretty_items AS
     ;
 
 -- Same as above, but without the picture payloads
+-- (Primarily used to build sidebar menus, where the extra overhead
+--  was causing load time problems)
 CREATE VIEW pretty_items_light AS
     SELECT i.item_id, i.name, i.description, i.cat_id, i.creator_id, i.changed,
         u.username AS creator_name,
