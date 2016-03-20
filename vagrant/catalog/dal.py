@@ -248,7 +248,7 @@ def create_item(name, category_id, creator_id, pic, description=None):
 def delete_item(item_id):
     __simple_delete("items", Item, "item_id", item_id)
 
-def update_item(item_id, name=None, description=None, pic=None, cat_id=None):
+def update_item(item_id, name=None, description=None, pic_id=None, pic=None, cat_id=None):
     # It would probably be more efficient to smash everything into a single SQL statement;
     # going to keep it simple for this project though.  Item updates should be fairly
     # uncommon anyway.
@@ -260,7 +260,9 @@ def update_item(item_id, name=None, description=None, pic=None, cat_id=None):
             cursor.execute("UPDATE items SET description=? WHERE item_id=?", (description, item_id))
 
         if pic is not None:
-            cursor.execute("UPDATE items SET pic=? WHERE item_id=?", (sqlite3.Binary(pic), item_id))
+            if pic_id is None:
+                raise ValueError("Received updated picture data, but no pic_id")
+            cursor.execute("UPDATE pictures SET pic=? WHERE pic_id=?", (sqlite3.Binary(pic), pic_id))
 
         if cat_id is not None:
             cursor.execute("UPDATE items SET cat_id=? WHERE item_id=?", (cat_id, item_id))

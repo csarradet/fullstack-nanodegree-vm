@@ -324,7 +324,8 @@ def itemUpdate():
 
     # New values look good.  All checks passed.
     generate_nonce()
-    dal.update_item(old_item.item_id, name=new_item_name, description=desc, pic=pic_data, cat_id=new_cat_id)
+    dal.update_item(old_item.item_id, name=new_item_name, description=desc,
+        pic_id=old_item.pic_id, pic=pic_data, cat_id=new_cat_id)
     redirect_cat = new_parent_name or old_parent_name
     redirect_item = new_item_name or old_item_name
     return redirect("/catalog/{}/{}/".format(redirect_cat, redirect_item))
@@ -413,12 +414,15 @@ def gconnect():
 
 if __name__ == '__main__':
     app.debug = True
-    
+
     # Tip from http://stackoverflow.com/questions/14737531/how-to-i-delete-all-flask-sessions,
     # setting a fresh key wipes all existing sessions when the server is restarted.
     # Handles problems like "phantom" accounts still being logged in after a DB wipe.
-    app.secret_key = os.urandom(32)
-    
+    #app.secret_key = os.urandom(32)
+    # Use this static key instead when debugging, to prevent having to log back in
+    # frequently:
+    app.secret_key = "not_so_secret"
+
     app.config["SESSION_TYPE"] = "filesystem"
     print "Starting catalogifier web service; press ctrl-c to exit."
     app.run(host = '0.0.0.0', port = 5000)

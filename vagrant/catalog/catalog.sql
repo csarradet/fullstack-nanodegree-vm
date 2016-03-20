@@ -73,7 +73,7 @@ CREATE VIEW pretty_categories AS
     ;
 
 CREATE VIEW pretty_items AS
-    SELECT i.item_id, i.name, i.description, i.cat_id, i.creator_id, i.changed,
+    SELECT i.item_id, i.name, i.description, i.pic_id, i.cat_id, i.creator_id, i.changed,
         u.username AS creator_name,
         c.name AS cat_name,
         p.pic
@@ -87,7 +87,7 @@ CREATE VIEW pretty_items AS
 -- (Primarily used to build sidebar menus, where the extra overhead
 --  was causing load time problems)
 CREATE VIEW pretty_items_light AS
-    SELECT i.item_id, i.name, i.description, i.cat_id, i.creator_id, i.changed,
+    SELECT i.item_id, i.name, i.description, i.pic_id, i.cat_id, i.creator_id, i.changed,
         u.username AS creator_name,
         c.name AS cat_name
     FROM items AS i
