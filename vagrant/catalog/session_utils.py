@@ -38,7 +38,7 @@ def load_from_session(key):
 
 def generate_nonce():
     """
-    Creates a new one-time key for use by our login and POST forms (to prevent XSS attacks)
+    Creates a new one-time key for use by our login and POST forms (to prevent CSRF attacks)
     """
     state = gibberish()
     session[SessionKeys.STATE] = state
