@@ -12,8 +12,9 @@ For more info on how these entities are persisted, see dal.py
 import json
 
 def jdefault(o):
-    # Special case for encoding binary picture data on items
+    """ JSON encoder used to serialize Entities """
     if isinstance(o, buffer):
+        # Special case for encoding binary picture data on items
         return str(o)
     return o.__dict__
 

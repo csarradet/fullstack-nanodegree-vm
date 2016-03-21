@@ -33,14 +33,13 @@ def date_to_atom_friendly(date):
 
 
 def __create_response(obj, content_type, http_status_code):
+    """ Creates an HTTP response of the given content_type and status """
     response = make_response(obj, http_status_code)
     response.headers["Content-Type"] = content_type
     return response
 
 def create_atom_response(obj, http_status_code=200):
-    """
-    Dumps the provided object into a response with MIME type set for an Atom feed.
-    """
+    """Dumps the provided object into a response with MIME type set for an Atom feed."""
     return __create_response(obj, "application/atom+xml", http_status_code)
 
 def create_json_response(obj, http_status_code=200):
@@ -51,12 +50,17 @@ def create_json_response(obj, http_status_code=200):
     return __create_response(obj, "application/json", http_status_code)
 
 def create_err_response(message, err_code):
-    """ Ignores any remaining web handler code and logs + throws the provided error. """
+    """
+    Logs the error and creates a corresponding HTTP error response.
+    Handlers calling this function (or the xxx_error() functions below)
+    should stop executing handler logic and return this response immediately.
+    """
     response = create_json_response(json.dumps(message), http_status_code=err_code)
     logger.error("{} error: {}".format(err_code, message))
     return response
 
 
+# Convenience definitions for common HTTP error codes:
 def bad_request_error():
     return create_err_response("Your request contained invalid data", 400)
 
@@ -75,11 +79,14 @@ def already_exists_error():
 def internal_error():
     return create_err_response("Internal server error", 500)
 
+
+
 def render(filename, **kwargs):
     """
     Decorator for flask's render_template() function.
     Passes along any provided kwargs after adding in a few fields
-    required by our base template, like info on the logged in user.
+    required by our base template, like info on the logged in user
+    and sidebar items.
     """
     kwargs["current_user"] = get_active_user()
     kwargs["items_by_cat"] = list_items_by_cat()

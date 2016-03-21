@@ -8,6 +8,11 @@ concatenation for table and column names, they're only intended
 to be used from within this module and are always called with static values.
 All data originating from the user (things like names and ID numbers)
 are properly passed to the DB using parameterized queries.
+
+(Side note: while the intro lessons for this project used SQLAlchemy,
+    I have some philosophical issues with ORM.  Absent the need to support
+    multiple DB types, I prefer to have the database code under my
+    control in its own module.)
 """
 
 import contextlib
@@ -89,7 +94,8 @@ def __simple_get(UNSAFE_table_name, UNSAFE_entity_class, UNSAFE_search_field, se
     UNSAFE fields may be processed through simple string formatting;
     *do not* send user input to these fields.
 
-    Gets the first entity of type entity_class from table_name with the given ID.
+    Gets the first entity of type entity_class from table_name whose data in
+    column search_field matches search_text.
     """
     output = None
     with get_cursor() as cursor:
@@ -103,7 +109,8 @@ def __simple_delete(UNSAFE_table_name, UNSAFE_entity_class, UNSAFE_search_field,
     UNSAFE fields may be processed through simple string formatting;
     *do not* send user input to these fields.
 
-    Deletes all entities of type entity_class from table_name with the given ID.
+    Deletes all entities of type entity_class from table_name whose data in
+    column search_field matches search_text.
     """
     with get_cursor() as cursor:
         cursor.execute('PRAGMA foreign_keys = ON')
@@ -113,9 +120,14 @@ def __simple_delete(UNSAFE_table_name, UNSAFE_entity_class, UNSAFE_search_field,
 
 
 def get_users():
+    """ Returns a list of all users who have ever logged in. """
     return __simple_get_all("users", User)
 
 def get_user(user_id):
+    """
+    Returns a User instance if the user_id corresponds to someone who has
+    logged in before, or None if it doesn't.
+    """
     return __simple_get("users", User, "user_id", user_id)
 
 def get_or_create_user(username, auth_source, auth_source_id):
@@ -151,12 +163,15 @@ def create_user(username, auth_source, auth_source_id):
 
 
 def get_categories():
+    """ Get a list of all categories that currently exist. """
     return __simple_get_all("pretty_categories", Category)
 
 def get_category(cat_id):
+    """ Get a particular category if it exists, or None if it doesn't. """
     return __simple_get("pretty_categories", Category, "cat_id", cat_id)
 
 def get_category_by_name(cat_name):
+    """ Get a particular category if it exists, or None if it doesn't. """
     return __simple_get("pretty_categories", Category, "name", cat_name)
 
 def create_category(name, creator_id):
@@ -170,21 +185,30 @@ def create_category(name, creator_id):
     return id
 
 def delete_category(cat_id):
+    """ Delete a particular category if it exists. """
     __simple_delete("categories", Category, "cat_id", cat_id)
 
 def update_category(cat_id, name):
+    """ Update the DB record for a particular category. """
     with get_cursor() as cursor:
         cursor.execute('UPDATE categories SET name=? WHERE cat_id=?', (name, cat_id))
 
 
 
 def get_items():
+    """ Get a list of all items that exist. """
     return __simple_get_all("pretty_items", Item)
 
 def get_item(item_id):
+    """ Get a particular item if it exists, or None if it doesn't. """
     return __simple_get("pretty_items", Item, "item_id", item_id)
 
 def get_items_by_cat(cat_id, lightweight=False):
+    """
+    Get a list of all items that belong to a particular category.
+    If lightweight, some bulky information like binary picture data
+    may be missing from the item instances.
+    """
     output = []
     with get_cursor() as cursor:
         if lightweight:
@@ -197,6 +221,7 @@ def get_items_by_cat(cat_id, lightweight=False):
     return output
 
 def get_item_by_name(cat_id, item_name):
+    """ Get a particular item if it exists, or None if it doesn't. """
     output = None
     with get_cursor() as cursor:
         cursor.execute('SELECT * FROM pretty_items WHERE cat_id = ? AND name = ?',
@@ -205,6 +230,7 @@ def get_item_by_name(cat_id, item_name):
     return output
 
 def get_recent_items(count):
+    """ Get a list of the <count> most recent items that have been created or changed. """
     output = []
     with get_cursor() as cursor:
         cursor.execute('SELECT * FROM pretty_items ORDER BY changed DESC LIMIT ?', (count,))
@@ -228,6 +254,7 @@ def list_items_by_cat():
     return output
 
 def create_item(name, category_id, creator_id, pic, description=None):
+    """ Creates a new Item instance and returns its item_id. """
     id = None
     if description is None:
         description = "Placeholder item description"
@@ -246,9 +273,17 @@ def create_item(name, category_id, creator_id, pic, description=None):
     return id
 
 def delete_item(item_id):
+    """ Deletes a particular item. """
     __simple_delete("items", Item, "item_id", item_id)
 
 def update_item(item_id, name=None, description=None, pic_id=None, pic=None, cat_id=None):
+    """
+    Selectively updates the DB fields for a particular item.  Any fields that are left as
+    None will retain their existing values.
+
+    If pic (binary picture data) is not none, a pic_id must also be provided.
+    """
+
     # It would probably be more efficient to smash everything into a single SQL statement;
     # going to keep it simple for this project though.  Item updates should be fairly
     # uncommon anyway.

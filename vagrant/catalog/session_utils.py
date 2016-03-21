@@ -22,14 +22,14 @@ def gibberish(len=32):
         string.digits) for x in xrange(len))
 
 class SessionKeys(object):
-    """ Enum listing all values used as keys within a Flask session """
+    """ Enum listing all values used as keys within a Flask session by our app """
     CURRENT_USER = "current_user"
     CREDENTIALS = "credentials"
     GPLUS_ID = "gplus_id"
     STATE = "state"
 
-def save_to_session(key, obj):
-    """ Converts the object to a serializable format and stores it in a Flask session. """
+def save_to_session(key, entity):
+    """ Converts the entity to a serializable format and stores it in a Flask session. """
     session[key] = obj.to_json()
 
 def load_from_session(key):
@@ -37,13 +37,16 @@ def load_from_session(key):
     return json.loads(session[key])
 
 def generate_nonce():
+    """
+    Creates a new one-time key for use by our login and POST forms (to prevent XSS attacks)
+    """
     state = gibberish()
     session[SessionKeys.STATE] = state
     return state
 
 def get_current_nonce():
     """
-    Returns the current state, generating a new one only if it's empty
+    Returns the current one-time key, generating a new one only if it's empty
     """
     try:
         return session[SessionKeys.STATE]

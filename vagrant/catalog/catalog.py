@@ -46,7 +46,7 @@ from handler_utils import (
     not_authenticated_error,
     not_authorized_error,
     not_found_error,
-    render
+    render,
     )
 from session_utils import (
     check_nonce,
@@ -55,7 +55,7 @@ from session_utils import (
     load_from_session,
     save_to_session,
     SessionKeys,
-    set_active_user
+    set_active_user,
     )
 
 
@@ -63,7 +63,7 @@ from session_utils import (
 def download_static_file(filename):
     """
     Safely serves static files, like .css or .js resources.
-    Using send_from_directory will prevent directory traversal attacks.
+    Uses send_from_directory to prevent directory traversal attacks.
     """
     return send_from_directory("/static", filename, as_attachment=True)
 
@@ -112,6 +112,9 @@ def atomEndpoint():
 
 @app.route('/catalog/create-cat/', methods=['POST'])
 def categoryCreate():
+    """
+    Creates a new category owned by the logged-in user
+    """
     state = request.values.get('state')
     if not check_nonce(state):
         return bad_request_error()
@@ -132,6 +135,9 @@ def categoryCreate():
 
 @app.route('/catalog/delete-cat/', methods=['POST'])
 def categoryDelete():
+    """
+    Deletes a category owned by the logged-in user
+    """
     state = request.values.get('state')
     if not check_nonce(state):
         return bad_request_error()
@@ -154,6 +160,9 @@ def categoryDelete():
 
 @app.route('/catalog/update-cat/', methods=['POST'])
 def categoryUpdate():
+    """
+    Updates a category owned by the logged-in user
+    """
     state = request.values.get('state')
     if not check_nonce(state):
         return bad_request_error()
@@ -178,6 +187,9 @@ def categoryUpdate():
 
 @app.route('/catalog/<cat_name>/<item_name>/')
 def itemLookupByName(cat_name, item_name):
+    """
+    Looks up an item based on its human-readable item and category names
+    """
     cat = dal.get_category_by_name(cat_name)
     if not cat:
         return not_found_error()
@@ -191,6 +203,9 @@ def itemLookupByName(cat_name, item_name):
 
 @app.route('/catalog/create-item/', methods=['POST'])
 def itemCreate():
+    """
+    Creates a new item owned by the logged-in user
+    """
     state = request.values.get('state')
     if not check_nonce(state):
         return bad_request_error()
@@ -255,6 +270,9 @@ class InvalidPictureError(Exception):
 
 @app.route('/catalog/delete-item/', methods=['POST'])
 def itemDelete():
+    """
+    Deletes an item owned by the current user
+    """
     state = request.values.get('state')
     if not check_nonce(state):
         return bad_request_error()
@@ -283,7 +301,10 @@ def itemDelete():
 
 @app.route('/catalog/update-item/', methods=['POST'])
 def itemUpdate():
-    # This will take a few steps. Start with loading the old object and doing
+    """
+    Selectively update fields on an item owned by the logged-in user
+    """
+    # This will take a few steps. Start with loading the old object and performing
     # our usual auth process.
     state = request.values.get('state')
     if not check_nonce(state):
@@ -418,10 +439,11 @@ if __name__ == '__main__':
     # Tip from http://stackoverflow.com/questions/14737531/how-to-i-delete-all-flask-sessions,
     # setting a fresh key wipes all existing sessions when the server is restarted.
     # Handles problems like "phantom" accounts still being logged in after a DB wipe.
-    #app.secret_key = os.urandom(32)
+    app.secret_key = os.urandom(32)
+
     # Use this static key instead when debugging, to prevent having to log back in
     # frequently:
-    app.secret_key = "not_so_secret"
+    #app.secret_key = "not_so_secret"
 
     app.config["SESSION_TYPE"] = "filesystem"
     print "Starting catalogifier web service; press ctrl-c to exit."
