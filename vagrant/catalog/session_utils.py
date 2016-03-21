@@ -30,7 +30,7 @@ class SessionKeys(object):
 
 def save_to_session(key, entity):
     """ Converts the entity to a serializable format and stores it in a Flask session. """
-    session[key] = obj.to_json()
+    session[key] = entity.to_json()
 
 def load_from_session(key):
     """ Loads serialized data from a Flask session and converts it back into an object. """
