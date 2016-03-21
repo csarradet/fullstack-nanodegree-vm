@@ -7,6 +7,7 @@ and launch the webserver:
     <li>(browse to the catalog project directory)</li>
     <li>python dal.py</li>
     <li>python catalog.py</li>
+    </ul>
 
 Once that is complete, follow along with the walkthrough below for a feature overview.
 
